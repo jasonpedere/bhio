@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sole.bio/sitemap.xml
+Sitemap: https://solebio.link/sitemap.xml
