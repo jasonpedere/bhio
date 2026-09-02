@@ -40,9 +40,9 @@
       }
     }
   </script>
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="./icons/icon-192.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Mono&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -135,7 +135,7 @@
     <nav class="mobile-tabs"><button class="active" data-view="edit">Edit</button><button data-view="preview">Preview</button></nav>
     <div class="share-modal" id="shareModal" aria-hidden="true"><div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="shareTitle"><button class="share-close" id="shareClose" aria-label="Close share dialog">&times;</button><h2 id="shareTitle">Share your page</h2><p>Let people find you anywhere.</p><img class="share-qr" id="shareQr" alt="QR code for your public page" /><span class="share-url" id="shareUrl">solebio.link/tessalee</span><div class="share-actions"><button class="share-action" id="copyLink"><i class="fa-solid fa-link"></i><span>Copy</span></button><a class="share-action" id="shareFacebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i>Facebook</a><a class="share-action" id="shareMessenger" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-messenger"></i>Messenger</a><a class="share-action" id="shareEmail"><i class="fa-solid fa-envelope"></i>Email</a></div></div></div>
   </main>
-  <script src="./supabase-config.js"></script>
+  <script src="/supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = window.SUPABASE_URL || '';
@@ -225,7 +225,7 @@
     $('#copyLink').addEventListener('click', async () => { await navigator.clipboard.writeText(publicUrl()); $('#copyLink span').textContent = 'Copied'; setTimeout(() => { $('#copyLink span').textContent = 'Copy'; }, 1600); });
     $('#shareModal').addEventListener('click', event => { if (event.target === $('#shareModal')) $('#shareClose').click(); });
     ensureLinkAnalytics(); pages = [{ name:'Page 1', ...capturePage() }]; renderPageSwitcher(); renderLinks(); renderSocials(); updateShareLinks(); autoResizeTextarea($('#bio')); renderAnalytics();
-    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(error => console.error('Could not register service worker:', error)));
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(error => console.error('Could not register service worker:', error)));
   </script>
 </body>
 </html>
