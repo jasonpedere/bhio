@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="340" height="96" viewBox="0 0 340 96">
-  <rect width="96" height="96" rx="21" fill="#d9ff6a"/>
-  <circle cx="48" cy="48" r="21" fill="#172219"/>
-  <path d="M48 28c-8.4 0-15.4 6.9-15.4 15.4 0 12.2 15.4 22.1 15.4 22.1s15.4-9.9 15.4-22.1C63.4 34.9 56.4 28 48 28Z" fill="#254b38"/>
-  <circle cx="48" cy="44.6" r="5.1" fill="#d9ff6a"/>
-  <text x="116" y="65" font-family="DM Sans, Arial, sans-serif" font-weight="700" font-size="52" letter-spacing="-2" fill="#fafbf8">Sole</text>
-</svg>
