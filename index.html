@@ -3,7 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Sole - Bio Editor</title>
+  <title>Sole | Beautiful link-in-bio pages</title>
+  <meta name="theme-color" content="#172219" />
+  <meta name="description" content="Create a beautiful link-in-bio page with Sole. Share your work, social profiles, and everything you make from one memorable link." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="Sole" />
+  <link rel="canonical" href="https://sole.bio/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sole" />
+  <meta property="og:url" content="https://sole.bio/" />
+  <meta property="og:title" content="Sole | Beautiful link-in-bio pages" />
+  <meta property="og:description" content="Share your work, social profiles, and everything you make from one memorable link." />
+  <meta property="og:image" content="https://sole.bio/icons/icon-512.svg" />
+  <meta property="og:image:alt" content="Sole link-in-bio pages" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Sole | Beautiful link-in-bio pages" />
+  <meta name="twitter:description" content="Create a beautiful link-in-bio page for everything you share." />
+  <meta name="twitter:image" content="https://sole.bio/icons/icon-512.svg" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Sole",
+      "url": "https://sole.bio/",
+      "description": "Create a beautiful link-in-bio page for everything you share.",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Web"
+    }
+  </script>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Mono&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fredoka:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&family=Sora:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -75,6 +105,7 @@
       .landing-art { display:none; }
     }
     .phone-avatar { background-size:cover; background-position:center; background-repeat:no-repeat; }
+    .analytics-grid { display:grid; gap:8px; }.analytics-item { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:13px 0; border-bottom:1px solid var(--line); }.analytics-item:last-child { border-bottom:0; }.analytics-link { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }.analytics-count { flex:0 0 auto; color:var(--forest); font:12px "DM Mono",monospace; }.analytics-empty { color:var(--muted); font-size:12px; }
   </style>
 </head>
 <body>
@@ -111,6 +142,15 @@
     const inputMap = { displayName:['.phone-name'], username:['#phoneHandle'], bio:['.phone-bio'], location:['#phoneLocation'] };
     const $ = selector => document.querySelector(selector);
     const fontControl = document.createElement('div'); fontControl.className = 'control'; fontControl.style.marginBottom = '22px'; fontControl.innerHTML = '<label for="font">Choose font</label><select id="font"><option value="DM Sans">DM Sans</option><option value="Manrope">Manrope</option><option value="Outfit">Outfit</option><option value="Sora">Sora</option><option value="Space Grotesk">Space Grotesk</option><option value="Work Sans">Work Sans</option><option value="Playfair Display">Playfair Display</option><option value="Lora">Lora</option><option value="Cormorant Garamond">Cormorant Garamond</option><option value="Bebas Neue">Bebas Neue</option><option value="Anton">Anton</option><option value="Archivo Black">Archivo Black</option><option value="Fredoka">Fredoka</option><option value="DM Mono">DM Mono</option><option value="IBM Plex Mono">IBM Plex Mono</option></select>'; $('#appearance').append(fontControl);
+    const analyticsSection = document.createElement('section');
+    analyticsSection.className = 'section';
+    analyticsSection.innerHTML = '<div class="section-head"><span class="section-title">Link analytics</span><span class="edit-hint">Clicks from preview</span></div><div class="analytics-grid" id="analyticsList"></div>';
+    $('#editor').append(analyticsSection);
+    function ensureLinkAnalytics() { state.links.forEach(link => { link.id = link.id || (crypto.randomUUID ? crypto.randomUUID() : `link-${Date.now()}-${Math.random().toString(36).slice(2)}`); link.clicks = Number.isFinite(link.clicks) ? link.clicks : 0; }); }
+    function renderAnalytics() { ensureLinkAnalytics(); const list = $('#analyticsList'); if (!state.links.length) { list.innerHTML = '<div class="analytics-empty">Add a link to start tracking clicks.</div>'; return; } list.innerHTML = ''; state.links.forEach(link => { const item = document.createElement('div'); item.className = 'analytics-item'; const title = document.createElement('span'); title.className = 'analytics-link'; title.textContent = link.title || 'Untitled link'; const count = document.createElement('span'); count.className = 'analytics-count'; count.textContent = `${link.clicks} ${link.clicks === 1 ? 'click' : 'clicks'}`; item.append(title, count); list.append(item); }); }
+    const analyticsObserver = new MutationObserver(renderAnalytics);
+    analyticsObserver.observe($('#phoneLinks'), { childList:true });
+    $('#phoneLinks').addEventListener('click', event => { const card = event.target.closest('.phone-link'); if (!card) return; const index = Number(card.dataset.focus.replace('link-', '')); const link = state.links[index]; if (!link) return; ensureLinkAnalytics(); link.clicks += 1; renderAnalytics(); queueSave(); });
     let authMode = 'login';
     function capturePage() { return { displayName:$('#displayName').value, username:$('#username').value, bio:$('#bio').value, location:$('#location').value, pageTitle:$('#pageTitle').value, visibility:$('#visibility').checked, settings:JSON.parse(JSON.stringify(state)) }; }
     function applyPage(page) { const settings = page.settings || {}; Object.keys(state).forEach(key => delete state[key]); Object.assign(state, JSON.parse(JSON.stringify(settings))); state.font = state.font || 'DM Sans'; $('#displayName').value = page.displayName || ''; $('#username').value = page.username || ''; $('#bio').value = page.bio || ''; $('#location').value = page.location || ''; $('#pageTitle').value = page.pageTitle || ''; $('#visibility').checked = page.visibility !== false; syncAll(); renderPageSwitcher(); }
@@ -175,7 +215,8 @@
     $('#shareClose').addEventListener('click', () => { $('#shareModal').classList.remove('open'); $('#shareModal').setAttribute('aria-hidden', 'true'); });
     $('#copyLink').addEventListener('click', async () => { await navigator.clipboard.writeText(publicUrl()); $('#copyLink span').textContent = 'Copied'; setTimeout(() => { $('#copyLink span').textContent = 'Copy'; }, 1600); });
     $('#shareModal').addEventListener('click', event => { if (event.target === $('#shareModal')) $('#shareClose').click(); });
-    pages = [{ name:'Page 1', ...capturePage() }]; renderPageSwitcher(); renderLinks(); renderSocials(); updateShareLinks(); autoResizeTextarea($('#bio'));
+    ensureLinkAnalytics(); pages = [{ name:'Page 1', ...capturePage() }]; renderPageSwitcher(); renderLinks(); renderSocials(); updateShareLinks(); autoResizeTextarea($('#bio')); renderAnalytics();
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(error => console.error('Could not register service worker:', error)));
   </script>
 </body>
 </html>
