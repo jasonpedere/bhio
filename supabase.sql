@@ -57,10 +57,6 @@ create policy "Users can upload their own profile images"
   with check (bucket_id = 'profile-images' and (storage.foldername(name))[1] = (select auth.uid())::text);
 
 drop policy if exists "Profile images are publicly readable" on storage.objects;
-create policy "Profile images are publicly readable"
-  on storage.objects for select
-  to public
-  using (bucket_id = 'profile-images');
 
 drop policy if exists "Users can update their own profile images" on storage.objects;
 create policy "Users can update their own profile images"
