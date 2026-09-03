@@ -613,14 +613,17 @@ function getService(url) {
     ) || "website"
   );
 }
-function getIcon(link) {
-  const treatment = `icon-${state.linkStyle.iconTreatment}`;
+function getIcon(link, linkStyle = state.linkStyle) {
+  const currentLinkStyle = linkStyle || state.linkStyle || {};
+  const treatment = `icon-${currentLinkStyle.iconTreatment || "plain"}`;
   if (link.iconMode === "none") return "";
-  if (link.iconMode === "image" && link.customImage)
-    return `<i class="link-symbol ${treatment}" style="background-image:url('${link.customImage}');background-size:cover;color:transparent">IMG</i>`;
+  if (link.iconMode === "image" && link.customImage) {
+    const escapedUrl = link.customImage.replace(/'/g, "\\'");
+    return `<i class="link-symbol ${treatment}" style="background-image:url('${escapedUrl}');background-size:cover;background-position:center;color:transparent">IMG</i>`;
+  }
   return link.iconMode === "image"
     ? `<i class="link-symbol ${treatment} fa-solid fa-image"></i>`
-    : `<i class="link-symbol ${treatment} ${services[getService(link.url)]}"></i>`;
+    : `<i class="link-symbol ${treatment} ${services[getService(link.url)] || services.website}"></i>`;
 }
 function renderLinks() {
   $("#linkList").innerHTML = state.links
@@ -636,7 +639,8 @@ function renderLinks() {
         state.linkStyle.iconPosition === "right"
           ? `<span>${link.title}</span>${icon}`
           : `${icon}<span>${link.title}</span>`;
-      return `<button class="phone-link content-${state.linkStyle.align} ${link.enabled ? "" : "off"}" style="background:${state.linkStyle.color};${state.linkStyle.color === "#172219" ? "color:#fff" : ""}" data-focus="link-${index}">${content}</button>`;
+      const isDark = state.linkStyle.color === "#172219";
+      return `<button class="phone-link content-${state.linkStyle.align} ${link.enabled ? "" : "off"}" style="background:${state.linkStyle.color};${isDark ? "color:#fff;border-color:rgba(255,255,255,0.14);" : ""}" data-focus="link-${index}">${content}</button>`;
     })
     .join("");
 }
@@ -1299,6 +1303,20 @@ function renderPublicProfile(profile) {
         };
   const pageSettings = page.settings || settings;
   const background = pageSettings.background || "#e6f1dc";
+  const font = pageSettings.font || "DM Sans";
+  const template = pageSettings.template || "classic";
+  const radius = pageSettings.radius ?? 8;
+  const linkStyle = pageSettings.linkStyle || {
+    color: "#ffffff",
+    align: "center",
+    iconPosition: "left",
+    iconTreatment: "plain",
+  };
+  const align = linkStyle.align || "center";
+  const iconPosition = linkStyle.iconPosition || "left";
+  const linkColor = linkStyle.color || "#ffffff";
+  const isDarkLink = linkColor === "#172219";
+
   const links = Array.isArray(pageSettings.links)
     ? pageSettings.links.filter((link) => link.enabled)
     : [];
@@ -1306,8 +1324,9 @@ function renderPublicProfile(profile) {
     ? pageSettings.socials.filter((social) => social.enabled)
     : [];
   const content = document.createElement("main");
-  content.className = "public-profile";
+  content.className = `public-profile ${template === "classic" ? "" : "template-" + template}`;
   content.style.background = background;
+  content.style.fontFamily = `'${font}', sans-serif`;
   const inner = document.createElement("div");
   inner.className = "public-profile-inner";
   if (pageSettings.profileImage) {
@@ -1342,11 +1361,27 @@ function renderPublicProfile(profile) {
     const href = normalizeExternalUrl(link.url || "");
     if (!href) return;
     const anchor = document.createElement("a");
-    anchor.className = "public-profile-link";
+    anchor.className = `public-profile-link content-${align}`;
     anchor.href = href;
     anchor.target = "_blank";
     anchor.rel = "noopener noreferrer";
-    anchor.textContent = link.title || href;
+    anchor.style.borderRadius = `${radius}px`;
+    anchor.style.background = linkColor;
+    if (isDarkLink) {
+      anchor.style.color = "#fff";
+      anchor.style.borderColor = "rgba(255, 255, 255, 0.14)";
+    }
+
+    const iconHtml = getIcon(link, linkStyle);
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = link.title || href;
+
+    if (iconPosition === "right") {
+      anchor.innerHTML = `${titleSpan.outerHTML}${iconHtml}`;
+    } else {
+      anchor.innerHTML = `${iconHtml}${titleSpan.outerHTML}`;
+    }
+
     linkList.append(anchor);
   });
   inner.append(linkList);

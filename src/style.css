@@ -8,8 +8,13 @@
   --forest: #254b38;
   --preview: #e6f1dc;
 }
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 * {
   scrollbar-width: none;
@@ -17,6 +22,11 @@
 *::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 body {
   margin: 0;
@@ -26,6 +36,9 @@ body {
   font-size: 14px;
   letter-spacing: 0;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 button,
 input,
@@ -33,9 +46,36 @@ textarea,
 select {
   font: inherit;
   color: inherit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 button {
   cursor: pointer;
+}
+i[class*="fa-"],
+.fa,
+.fa-solid,
+.fa-brands,
+.fa-regular {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
+}
+.avatar,
+.user-avatar,
+.phone-avatar,
+.public-profile-avatar,
+.landing-avatar {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: -webkit-optimize-contrast;
+}
+.landing-brand img,
+.auth-brand img,
+.brand img {
+  shape-rendering: geometricPrecision;
+  image-rendering: -webkit-optimize-contrast;
 }
 .app {
   min-height: 100vh;
@@ -485,6 +525,8 @@ button {
   align-items: center;
   margin-bottom: 12px;
   zoom: var(--preview-zoom, 0.7);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .preview-top span {
   font:
@@ -495,6 +537,8 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .preview-top span#previewUrl {
   margin-left: 10px;
@@ -507,11 +551,20 @@ button {
   background: var(--preview);
   overflow-y: auto;
   overflow-x: hidden;
-  box-shadow: 0 16px 36px #27423422;
+  box-shadow:
+    0 0 0 1px rgba(23, 34, 25, 0.08),
+    0 2px 6px rgba(23, 34, 25, 0.04),
+    0 12px 28px -4px rgba(23, 34, 25, 0.12),
+    0 24px 48px -6px rgba(23, 34, 25, 0.1);
   position: relative;
   zoom: var(--preview-zoom, 0.7);
   scrollbar-width: none;
   -ms-overflow-style: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  contain: paint layout;
 }
 .device::-webkit-scrollbar {
   display: none;
@@ -537,6 +590,10 @@ button {
   flex-direction: column;
   align-items: stretch;
   transition: 0.25s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transform: translateZ(0);
 }
 .public-share {
   position: absolute;
@@ -567,9 +624,15 @@ button {
   margin: 0 auto 17px;
   border-radius: 50%;
   background: linear-gradient(135deg, #eb9e91, #ffd7b0 52%, #8bb6a0);
-  border: 3px solid #fff8;
-  box-shadow: 0 4px 15px #47644922;
+  background-size: cover;
+  background-position: center;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(37, 75, 56, 0.08),
+    0 8px 18px rgba(37, 75, 56, 0.1);
   cursor: pointer;
+  image-rendering: -webkit-optimize-contrast;
 }
 .phone-name {
   margin: 0;
@@ -604,19 +667,26 @@ button {
 }
 .phone-link {
   min-height: 51px;
-  border: 0;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 8px;
   padding: 12px 16px;
   background: #fff;
   color: #172219;
   font-weight: 600;
   text-align: center;
-  box-shadow: 0 2px 0 #1e382411;
+  box-shadow:
+    0 1px 2px rgba(23, 34, 25, 0.04),
+    0 2px 5px rgba(23, 34, 25, 0.04);
   cursor: pointer;
-  transition: transform 0.15s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .phone-link:hover {
   transform: translateY(-1px);
+  box-shadow:
+    0 2px 6px rgba(23, 34, 25, 0.06),
+    0 6px 14px -2px rgba(23, 34, 25, 0.08);
 }
 .phone-link.off {
   opacity: 0.32;
@@ -1072,10 +1142,16 @@ button {
   width: min(100%, 360px);
   padding: 24px;
   background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
-  box-shadow: 0 20px 60px #17221945;
+  box-shadow:
+    0 4px 6px -1px rgba(23, 34, 25, 0.06),
+    0 16px 36px -4px rgba(23, 34, 25, 0.16),
+    0 32px 64px -8px rgba(23, 34, 25, 0.18);
   position: relative;
   text-align: center;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
 }
 .share-close {
   position: absolute;
@@ -1154,12 +1230,16 @@ button {
   width: 96px;
   height: 96px;
   margin: 0 auto 17px;
-  border: 3px solid #fff8;
+  border: 3px solid rgba(255, 255, 255, 0.85);
   border-radius: 50%;
   background: #fff;
   background-position: center;
   background-size: cover;
-  box-shadow: 0 4px 15px #47644922;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(37, 75, 56, 0.08),
+    0 8px 18px rgba(37, 75, 56, 0.1);
+  image-rendering: -webkit-optimize-contrast;
 }
 .public-profile h1 {
   margin: 0;
@@ -1191,13 +1271,32 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   padding: 12px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 8px;
   background: #fff;
   color: inherit;
   font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 2px 0 #1e382411;
+  box-shadow:
+    0 1px 2px rgba(23, 34, 25, 0.04),
+    0 2px 5px rgba(23, 34, 25, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.public-profile-link:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 6px rgba(23, 34, 25, 0.06),
+    0 8px 18px -2px rgba(23, 34, 25, 0.08);
+}
+.public-profile-link.content-left {
+  justify-content: flex-start;
+}
+.public-profile-link.content-right {
+  justify-content: flex-end;
 }
 .public-profile-socials {
   display: flex;
@@ -1532,9 +1631,17 @@ button {
   border: 7px solid #172219;
   border-radius: 38px;
   background: #dfead5;
-  box-shadow: 0 20px 40px #31503a22;
+  box-shadow:
+    0 0 0 1px rgba(23, 34, 25, 0.08),
+    0 2px 6px rgba(23, 34, 25, 0.04),
+    0 14px 28px -4px rgba(23, 34, 25, 0.1),
+    0 28px 56px -8px rgba(23, 34, 25, 0.12);
   text-align: center;
   position: relative;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .landing-phone::before {
   content: "";
@@ -1553,7 +1660,14 @@ button {
   margin: 0 auto 13px;
   border-radius: 50%;
   background: linear-gradient(135deg, #eb9e91, #ffd7b0 52%, #8bb6a0);
-  border: 3px solid #fff8;
+  background-size: cover;
+  background-position: center;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(37, 75, 56, 0.08),
+    0 6px 14px rgba(37, 75, 56, 0.1);
+  image-rendering: -webkit-optimize-contrast;
 }
 .landing-name {
   font-size: 19px;
@@ -1573,6 +1687,8 @@ button {
   border-radius: 8px;
   background: #fff;
   display: block;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(23, 34, 25, 0.04);
 }
 .landing-caption {
   position: absolute;
@@ -2442,10 +2558,16 @@ html.is-public-profile .app {
 .delete-dialog {
   width: min(100%, 390px);
   padding: 25px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 20px 60px #17221945;
+  box-shadow:
+    0 4px 6px -1px rgba(23, 34, 25, 0.06),
+    0 16px 36px -4px rgba(23, 34, 25, 0.16),
+    0 32px 64px -8px rgba(23, 34, 25, 0.18);
   position: relative;
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
 }
 .delete-dialog h2 {
   margin: 0 0 8px;
