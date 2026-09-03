@@ -287,6 +287,7 @@ function addPage() {
   queueSave();
 }
 function openEditor() {
+  document.documentElement.classList.add("has-session");
   $("#landing").hidden = true;
   $("#authScreen").classList.remove("open");
   $(".app").classList.add("editor-open");
@@ -294,6 +295,7 @@ function openEditor() {
 }
 function openLanding() {
   clearTimeout(saveTimer);
+  document.documentElement.classList.remove("has-session");
   $(".app").classList.remove("editor-open");
   $("#previewArea").classList.remove("show");
   $("#authScreen").classList.remove("open");
@@ -1238,21 +1240,29 @@ $("#shareModal").addEventListener("click", (event) => {
   if (event.target === $("#shareModal")) $("#shareClose").click();
 });
 async function restoreSession() {
-  if (!supabaseClient) return;
+  if (!supabaseClient) {
+    if (document.documentElement.classList.contains("has-session")) {
+      openLanding();
+    }
+    return;
+  }
   const {
     data: { session },
     error,
   } = await supabaseClient.auth.getSession();
-  if (error) {
-    console.error("Could not restore session:", error);
+  if (error || !session?.user) {
+    if (error) console.error("Could not restore session:", error);
+    if (document.documentElement.classList.contains("has-session")) {
+      openLanding();
+    }
     return;
   }
-  if (!session?.user) return;
   try {
     await loadProfile(session.user);
     openEditor();
   } catch (restoreError) {
     console.error("Could not restore profile:", restoreError);
+    openEditor();
   }
 }
 function publicUsernameFromPath() {
@@ -1385,6 +1395,9 @@ async function openPublicProfile(username) {
 const publicUsername = publicUsernameFromPath();
 if (publicUsername) openPublicProfile(publicUsername);
 else {
+  if (document.documentElement.classList.contains("has-session")) {
+    openEditor();
+  }
   ensureLinkAnalytics();
   if (!restoreDraft()) pages = [{ name: "Page 1", ...capturePage() }];
   renderPageSwitcher();

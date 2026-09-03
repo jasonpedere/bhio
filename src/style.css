@@ -1589,8 +1589,14 @@ button {
 .app {
   display: none;
 }
-.app.editor-open {
+.app.editor-open,
+html.has-session .app {
   display: grid;
+}
+html.has-session #landing,
+html.is-public-profile #landing,
+html.is-public-profile .app {
+  display: none !important;
 }
 .landing {
   padding-top: 28px;
@@ -2000,7 +2006,8 @@ button {
   body {
     background: #fff;
   }
-  .app.editor-open {
+  .app.editor-open,
+  html.has-session .app {
     display: block;
     padding-bottom: 70px;
   }
@@ -2261,7 +2268,8 @@ button {
   .landing-links-nav {
     display: none;
   }
-  .app.editor-open {
+  .app.editor-open,
+  html.has-session .app {
     display: block;
     padding-bottom: 70px;
   }
