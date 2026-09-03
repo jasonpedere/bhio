@@ -1773,11 +1773,12 @@ function renderPublicProfile(profile) {
     const cta = document.createElement("div");
     cta.className = "public-profile-cta";
     const ctaBtnUrl = page.ctaButtonUrl ? normalizeExternalUrl(page.ctaButtonUrl) || page.ctaButtonUrl : "";
+    const ctaTextColor = linkColor === "#172219" ? "#fff" : "#172219";
     cta.innerHTML = `
       <div class="public-profile-cta-card">
         ${page.ctaTitle ? `<h3 class="public-profile-cta-title">${escapeHtml(page.ctaTitle)}</h3>` : ""}
         ${page.ctaDesc ? `<p class="public-profile-cta-desc">${escapeHtml(page.ctaDesc)}</p>` : ""}
-        ${ctaBtnUrl ? `<a class="public-profile-cta-btn" href="${ctaBtnUrl}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(page.ctaButtonText || "Send a message")}</span><i class="fa-solid fa-arrow-right"></i></a>` : ""}
+        ${ctaBtnUrl ? `<a class="public-profile-cta-btn" style="background:${linkColor};color:${ctaTextColor} !important" href="${ctaBtnUrl}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(page.ctaButtonText || "Send a message")}</span><i class="fa-solid fa-arrow-right"></i></a>` : ""}
       </div>`;
     inner.append(cta);
   }
