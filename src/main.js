@@ -1,18 +1,16 @@
 const SUPABASE_URL = window.SUPABASE_URL || "";
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "";
-const AUTH_STORAGE_KEY = "solebio-auth";
+const AUTH_STORAGE_KEY = "bhio-auth";
 if (SUPABASE_URL) {
   const projectRef = new URL(SUPABASE_URL).hostname.split(".")[0];
   const legacyAuthStorageKey = `sb-${projectRef}-auth-token`;
-  if (
-    !localStorage.getItem(AUTH_STORAGE_KEY) &&
-    localStorage.getItem(legacyAuthStorageKey)
-  ) {
-    localStorage.setItem(
-      AUTH_STORAGE_KEY,
-      localStorage.getItem(legacyAuthStorageKey),
-    );
-    localStorage.removeItem(legacyAuthStorageKey);
+  if (!localStorage.getItem(AUTH_STORAGE_KEY)) {
+    const previous =
+      localStorage.getItem("solebio-auth") ||
+      localStorage.getItem(legacyAuthStorageKey);
+    if (previous) {
+      localStorage.setItem(AUTH_STORAGE_KEY, previous);
+    }
   }
 }
 const supabaseClient =
@@ -222,7 +220,7 @@ function renderPageSwitcher() {
     `<button class="add-page" type="button" id="addPage" ${pages.length >= MAX_PAGES ? "disabled" : ""} aria-label="Add page">+ Add page</button>`;
   $("#addPage").addEventListener("click", addPage);
 }
-const LOCAL_DRAFT_KEY = "solebio-draft";
+const LOCAL_DRAFT_KEY = "bhio-draft";
 function setSaveStatus(text) {
   $("#saveStatus").textContent = text;
 }
@@ -241,7 +239,10 @@ function saveDraftLocally() {
 }
 function restoreDraft() {
   try {
-    const draft = JSON.parse(localStorage.getItem(LOCAL_DRAFT_KEY) || "null");
+    const rawDraft =
+      localStorage.getItem(LOCAL_DRAFT_KEY) ||
+      localStorage.getItem("solebio-draft");
+    const draft = JSON.parse(rawDraft || "null");
     if (!draft || !Array.isArray(draft.pages) || !draft.pages.length)
       return false;
     pages = draft.pages.slice(0, MAX_PAGES);
@@ -310,7 +311,7 @@ function openAuth(mode) {
   $("#authScreen").classList.toggle("signup", signup);
   $("#authConfirmPassword").required = signup;
   $("#authKicker").textContent = signup ? "Make it yours" : "Welcome back";
-  $("#authTitle").textContent = signup ? "Create your Sole" : "Log in to Sole";
+  $("#authTitle").textContent = signup ? "Create your Bhio" : "Log in to Bhio";
   $("#authIntro").textContent = signup
     ? "Start with one beautiful page for everything you share."
     : "Pick up where you left off.";
@@ -318,7 +319,7 @@ function openAuth(mode) {
   $("#authToggle").textContent = signup ? "Log in" : "Create an account";
   $("#authSwitch").childNodes[0].textContent = signup
     ? "Already have an account? "
-    : "New to Sole? ";
+    : "New to Bhio? ";
   $("#authEmail").focus();
 }
 $("#landingStart").addEventListener("click", () => openAuth("signup"));
@@ -771,8 +772,8 @@ function syncInput(event) {
   fields.forEach((selector) => ($(selector).textContent = input.value));
   if (input.id === "username") {
     const clean = input.value.replace(/^@/, "");
-    $("#previewUrl").textContent = `solebio.link/${clean}`;
-    $("#urlPreview").textContent = `solebio.link/${clean}`;
+    $("#previewUrl").textContent = `bhio.link/${clean}`;
+    $("#urlPreview").textContent = `bhio.link/${clean}`;
     updateShareLinks();
     clearTimeout(usernameCheckTimer);
     usernameCheckTimer = setTimeout(() => {
@@ -1403,14 +1404,14 @@ function renderPublicProfile(profile) {
   }
   const footer = document.createElement("div");
   footer.className = "public-profile-footer";
-  footer.textContent = "sole";
+  footer.textContent = "bhio";
   inner.append(footer);
   content.append(inner);
   document.body.replaceChildren(content);
   document.title =
     page.pageTitle ||
     profile.page_title ||
-    `${page.displayName || profile.username} | Sole`;
+    `${page.displayName || profile.username} | Bhio`;
 }
 async function openPublicProfile(username) {
   document.body.replaceChildren();

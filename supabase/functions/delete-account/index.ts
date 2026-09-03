@@ -1,10 +1,12 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 function isAllowedOrigin(origin: string) {
-  return origin === "https://solebio.link" ||
+  return origin === "https://bhio.link" ||
+    origin === "https://www.bhio.link" ||
+    origin === "https://solebio.link" ||
     origin === "https://www.solebio.link" ||
-    /^https:\/\/solebio(?:-[a-z0-9-]+)?\.[a-z0-9-]+\.workers\.dev$/i.test(origin) ||
-    /^https:\/\/[a-z0-9-]+\.solebio\.pages\.dev$/i.test(origin) ||
+    /^https:\/\/(?:bhio|solebio)(?:-[a-z0-9-]+)?\.[a-z0-9-]+\.workers\.dev$/i.test(origin) ||
+    /^https:\/\/[a-z0-9-]+\.(?:bhio|solebio)\.pages\.dev$/i.test(origin) ||
     /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
 }
 
@@ -12,7 +14,7 @@ function corsHeaders(request: Request) {
   const origin = request.headers.get("origin") ?? "";
 
   return {
-    "Access-Control-Allow-Origin": isAllowedOrigin(origin) ? origin : "https://solebio.link",
+    "Access-Control-Allow-Origin": isAllowedOrigin(origin) ? origin : "https://bhio.link",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
     "Content-Type": "application/json",

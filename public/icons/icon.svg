@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#172219"/><circle cx="256" cy="256" r="112" fill="#d9ff6a"/><path d="M256 156c-45 0-82 37-82 82 0 65 82 118 82 118s82-53 82-118c0-45-37-82-82-82Z" fill="#254b38"/><circle cx="256" cy="238" r="27" fill="#d9ff6a"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bhioGrad" x1="10%" y1="90%" x2="90%" y2="10%">
+      <stop offset="0%" stop-color="#005bf6"/>
+      <stop offset="100%" stop-color="#a82ffc"/>
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="256" cy="256" r="216"/>
+    </clipPath>
+  </defs>
+  <circle cx="256" cy="256" r="216" fill="url(#bhioGrad)"/>
+  <circle cx="256" cy="256" r="160" fill="#ffffff"/>
+  <g clip-path="url(#circleClip)">
+    <path d="M 144 440 C 150 338, 196 286, 256 286 C 316 286, 362 338, 368 440 Z" fill="url(#bhioGrad)"/>
+    <circle cx="256" cy="214" r="46" fill="url(#bhioGrad)"/>
+  </g>
+</svg>

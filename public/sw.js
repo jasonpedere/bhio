@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sole-v7';
+const CACHE_NAME = 'bhio-v1';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-192.svg', '/icons/icon-512.svg'];
 
 self.addEventListener('install', event => {

@@ -1,7 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="340" height="96" viewBox="0 0 340 96">
-  <rect width="96" height="96" rx="21" fill="#172219"/>
-  <circle cx="48" cy="48" r="21" fill="#d9ff6a"/>
-  <path d="M48 28c-8.4 0-15.4 6.9-15.4 15.4 0 12.2 15.4 22.1 15.4 22.1s15.4-9.9 15.4-22.1C63.4 34.9 56.4 28 48 28Z" fill="#254b38"/>
-  <circle cx="48" cy="44.6" r="5.1" fill="#d9ff6a"/>
-  <text x="116" y="65" font-family="DM Sans, Arial, sans-serif" font-weight="700" font-size="52" letter-spacing="-2" fill="#172219">Sole</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="96" viewBox="0 0 360 96">
+  <defs>
+    <linearGradient id="bhioGrad" x1="10%" y1="90%" x2="90%" y2="10%">
+      <stop offset="0%" stop-color="#005bf6"/>
+      <stop offset="100%" stop-color="#a82ffc"/>
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="218" cy="49" r="28"/>
+    </clipPath>
+  </defs>
+
+  <!-- Wordmark bhi -->
+  <text x="70" y="68" font-family="'Outfit', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="64" letter-spacing="-1" fill="#005bf6">bhi</text>
+
+  <!-- Avatar o symbol -->
+  <circle cx="218" cy="49" r="28" fill="url(#bhioGrad)"/>
+  <circle cx="218" cy="49" r="21" fill="#ffffff"/>
+  <g clip-path="url(#circleClip)">
+    <path d="M 203 73 C 204 59, 210 52, 218 52 C 226 52, 232 59, 233 73 Z" fill="url(#bhioGrad)"/>
+    <circle cx="218" cy="43" r="6" fill="url(#bhioGrad)"/>
+  </g>
 </svg>
