@@ -2,6 +2,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 function isAllowedOrigin(origin: string) {
   return origin === "https://solebio.link" ||
+    origin === "https://www.solebio.link" ||
+    /^https:\/\/solebio(?:-[a-z0-9-]+)?\.[a-z0-9-]+\.workers\.dev$/i.test(origin) ||
+    /^https:\/\/[a-z0-9-]+\.solebio\.pages\.dev$/i.test(origin) ||
     /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
 }
 
