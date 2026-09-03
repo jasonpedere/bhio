@@ -657,67 +657,67 @@ async function saveProfile() {
     setSaveStatus("Saved locally");
     return;
   }
-  saveCurrentPage();
-  const {
-    data: { user },
-  } = await supabaseClient.auth.getUser();
-  if (!user) {
-    setSaveStatus("Saved locally");
-    return;
-  }
-  const page = pages[0] || capturePage();
-  const rawUsername = (page.username || "")
-    .trim()
-    .replace(/^@/, "")
-    .toLowerCase();
-  const validUsername = /^[a-z0-9_]{3,30}$/.test(rawUsername)
-    ? rawUsername
-    : user.user_metadata?.username ||
-      `user_${user.id.replace(/-/g, "").slice(0, 8)}`;
-  const extendedPayload = {
-    id: user.id,
-    display_name: (page.displayName || "").trim(),
-    username: validUsername,
-    headline: (page.headline || "").trim(),
-    occupation: (page.occupation || "").trim(),
-    tagline: (page.tagline || "").trim(),
-    bio: (page.bio || "").trim(),
-    about_me: (page.aboutMe || "").trim(),
-    interests: (page.interests || "").trim(),
-    location: (page.location || "").trim(),
-    page_title: (page.pageTitle || "").trim(),
-    visibility: page.visibility !== false,
-    cta_enabled: page.ctaEnabled !== false,
-    cta_title: (page.ctaTitle || "").trim(),
-    cta_desc: (page.ctaDesc || "").trim(),
-    cta_button_text: (page.ctaButtonText || "").trim(),
-    cta_button_url: (page.ctaButtonUrl || "").trim(),
-    settings: { pages },
-    updated_at: new Date().toISOString(),
-  };
-  let { error } = await supabaseClient.from("profiles").upsert(extendedPayload);
-  if (error) {
-    // If table has not run the new migration yet, fallback to base columns
-    const basePayload = {
+  try {
+    saveCurrentPage();
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+    if (!user) {
+      setSaveStatus("Saved locally; log in to sync");
+      return;
+    }
+    const page = pages[currentPageIndex] || pages[0] || capturePage();
+    const rawUsername = (page.username || "")
+      .trim()
+      .replace(/^@/, "")
+      .toLowerCase();
+    const validUsername = /^[a-z0-9_]{3,30}$/.test(rawUsername)
+      ? rawUsername
+      : user.user_metadata?.username ||
+        `user_${user.id.replace(/-/g, "").slice(0, 8)}`;
+    const extendedPayload = {
       id: user.id,
       display_name: (page.displayName || "").trim(),
       username: validUsername,
+      headline: (page.headline || "").trim(),
+      occupation: (page.occupation || "").trim(),
+      tagline: (page.tagline || "").trim(),
       bio: (page.bio || "").trim(),
+      about_me: (page.aboutMe || "").trim(),
+      interests: (page.interests || "").trim(),
       location: (page.location || "").trim(),
       page_title: (page.pageTitle || "").trim(),
       visibility: page.visibility !== false,
+      cta_enabled: page.ctaEnabled !== false,
+      cta_title: (page.ctaTitle || "").trim(),
+      cta_desc: (page.ctaDesc || "").trim(),
+      cta_button_text: (page.ctaButtonText || "").trim(),
+      cta_button_url: (page.ctaButtonUrl || "").trim(),
       settings: { pages },
       updated_at: new Date().toISOString(),
     };
-    const fallback = await supabaseClient.from("profiles").upsert(basePayload);
-    error = fallback.error;
-  }
-  if (error) {
+    let { error } = await supabaseClient.from("profiles").upsert(extendedPayload);
+    if (error) {
+      const basePayload = {
+        id: user.id,
+        display_name: (page.displayName || "").trim(),
+        username: validUsername,
+        bio: (page.bio || "").trim(),
+        location: (page.location || "").trim(),
+        page_title: (page.pageTitle || "").trim(),
+        visibility: page.visibility !== false,
+        settings: { pages },
+        updated_at: new Date().toISOString(),
+      };
+      const fallback = await supabaseClient.from("profiles").upsert(basePayload);
+      error = fallback.error;
+    }
+    if (error) throw error;
+    setSaveStatus("Saved");
+  } catch (error) {
     console.error("Could not save profile:", error);
-    setSaveStatus("Saved locally; sync pending");
-    return;
+    setSaveStatus(`Saved locally; sync failed (${error.message || "check connection"})`);
   }
-  setSaveStatus("Saved");
 }
 function queueSave() {
   if (isApplyingProfile) return;
@@ -1589,7 +1589,10 @@ function renderPublicProfile(profile) {
   if (!page.ctaDesc && profile.cta_desc) page.ctaDesc = profile.cta_desc;
   if (!page.ctaButtonText && profile.cta_button_text) page.ctaButtonText = profile.cta_button_text;
   if (!page.ctaButtonUrl && profile.cta_button_url) page.ctaButtonUrl = profile.cta_button_url;
-  const pageSettings = page.settings || settings;
+  const pageSettings =
+    page.settings && typeof page.settings === "object"
+      ? page.settings
+      : settings;
   const background = pageSettings.background || "#e6f1dc";
   const font = pageSettings.font || "DM Sans";
   const template = pageSettings.template || "classic";
@@ -1605,9 +1608,13 @@ function renderPublicProfile(profile) {
   const linkColor = linkStyle.color || "#ffffff";
   const isDarkLink = linkColor === "#172219";
 
-  const links = Array.isArray(pageSettings.links)
-    ? pageSettings.links.filter((link) => link.enabled)
-    : [];
+  const savedLinks = Array.isArray(pageSettings.links)
+    ? pageSettings.links
+    : Array.isArray(page.links)
+      ? page.links
+      : [];
+  const links = savedLinks
+    .filter((link) => link.enabled !== false);
   const socials = Array.isArray(pageSettings.socials)
     ? pageSettings.socials.filter((social) => social.enabled)
     : [];
