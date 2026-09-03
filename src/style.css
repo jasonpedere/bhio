@@ -725,13 +725,30 @@ i[class*="fa-"],
 .phone-link.off {
   opacity: 0.32;
 }
-.phone-footer {
-  margin-top: auto;
+.phone-footer,
+.phone-footer:link,
+.phone-footer:visited,
+.phone-footer:hover,
+.phone-footer:active,
+.phone-footer:focus {
+  margin-top: auto !important;
   padding-top: 25px;
   font-size: 11px;
   opacity: 0.52;
   font-weight: 700;
   letter-spacing: 0.2px;
+  text-decoration: none !important;
+  border: none !important;
+  outline: none !important;
+  color: inherit;
+  display: inline-block;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  user-select: none;
+}
+.phone-footer:hover {
+  opacity: 0.85;
 }
 .phone-page.theme-minimal {
   background: #fbfbf8;
@@ -1251,6 +1268,11 @@ i[class*="fa-"],
 }
 .public-profile {
   min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 52px 20px 28px;
   background: #e6f1dc;
   color: #172219;
@@ -1259,6 +1281,12 @@ i[class*="fa-"],
 .public-profile-inner {
   width: min(100%, 430px);
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1 0 auto;
+  min-height: calc(100vh - 80px);
+  min-height: calc(100dvh - 80px);
 }
 .public-profile-avatar {
   width: 96px;
@@ -1299,6 +1327,7 @@ i[class*="fa-"],
 .public-profile-links {
   display: grid;
   gap: 12px;
+  width: 100%;
 }
 .public-profile-link {
   min-height: 56px;
@@ -1351,10 +1380,33 @@ i[class*="fa-"],
   font-size: 19px;
 }
 .public-profile-footer {
-  margin-top: 38px;
+  margin-top: auto !important;
+  padding-top: 38px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+.public-profile-footer a,
+.public-profile-footer a:link,
+.public-profile-footer a:visited,
+.public-profile-footer a:hover,
+.public-profile-footer a:active,
+.public-profile-footer a:focus {
   font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.2px;
   opacity: 0.52;
+  color: inherit !important;
+  text-decoration: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  display: inline-block;
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+.public-profile-footer a:hover {
+  opacity: 0.85;
 }
 .editor .section,
 .editor .section + .section {

@@ -468,6 +468,14 @@ function syncAll() {
     .forEach((item) =>
       item.classList.toggle("active", item.dataset.bg === state.background),
     );
+  document
+    .querySelectorAll(".link-color")
+    .forEach((item) =>
+      item.classList.toggle("active", item.dataset.linkColor === (state.linkStyle.color || "#ffffff")),
+    );
+  if ($("#linkAlign")) $("#linkAlign").value = state.linkStyle.align || "center";
+  if ($("#iconPosition")) $("#iconPosition").value = state.linkStyle.iconPosition || "left";
+  if ($("#iconTreatment")) $("#iconTreatment").value = state.linkStyle.iconTreatment || "plain";
   $("#font").value = state.font || "DM Sans";
   renderLinks();
   renderSocials();
@@ -1402,9 +1410,14 @@ function renderPublicProfile(profile) {
     });
     inner.append(socialList);
   }
-  const footer = document.createElement("div");
+  const footer = document.createElement("footer");
   footer.className = "public-profile-footer";
-  footer.textContent = "bhio";
+  const link = document.createElement("a");
+  link.href = "/";
+  link.textContent = "Bhio";
+  link.style.color = "inherit";
+  link.style.textDecoration = "none";
+  footer.append(link);
   inner.append(footer);
   content.append(inner);
   document.body.replaceChildren(content);
