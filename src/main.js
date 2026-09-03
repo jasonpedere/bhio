@@ -40,8 +40,10 @@ const services = {
   telegram: "fa-brands fa-telegram",
   location: "fa-solid fa-location-dot",
 };
+const DEFAULT_TEMPLATE = "classic";
 const state = {
-  template: "classic",
+  template: DEFAULT_TEMPLATE,
+  profileShape: "circle",
   font: "DM Sans",
   background: "#e6f1dc",
   radius: 8,
@@ -184,17 +186,16 @@ function renderPreviewDetails() {
   const ctaDesc = $("#ctaDesc") ? $("#ctaDesc").value.trim() : "";
   const ctaBtnText = $("#ctaButtonText") ? $("#ctaButtonText").value.trim() : "Send a message";
   const ctaBtnUrl = $("#ctaButtonUrl") ? $("#ctaButtonUrl").value.trim() : "";
+  const ctaLinkColor = state.linkStyle?.color || "#ffffff";
+  const ctaTextColor = ctaLinkColor === "#172219" ? "#fff" : "#172219";
 
   if (ctaEl) {
     if (ctaEnabled && (ctaTitle || ctaDesc)) {
       ctaEl.innerHTML = `
         <div class="phone-cta-card">
-          <div class="phone-cta-top">
-            <span class="phone-cta-badge"><i class="fa-solid fa-paper-plane"></i> Let's Connect</span>
-          </div>
           ${ctaTitle ? `<h4 class="phone-cta-title">${escapeHtml(ctaTitle)}</h4>` : ""}
           ${ctaDesc ? `<p class="phone-cta-desc">${escapeHtml(ctaDesc)}</p>` : ""}
-          ${ctaBtnUrl ? `<a class="phone-cta-btn" href="${ctaBtnUrl}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(ctaBtnText || "Send a message")}</span><i class="fa-solid fa-arrow-right"></i></a>` : ""}
+          ${ctaBtnUrl ? `<a class="phone-cta-btn" style="background:${ctaLinkColor};color:${ctaTextColor} !important" href="${ctaBtnUrl}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(ctaBtnText || "Send a message")}</span><i class="fa-solid fa-arrow-right"></i></a>` : ""}
         </div>`;
       ctaEl.style.display = "block";
     } else {
@@ -310,7 +311,8 @@ function applyPage(page) {
     const settings = page.settings || {};
     Object.keys(state).forEach((key) => delete state[key]);
     Object.assign(state, JSON.parse(JSON.stringify(settings)));
-    state.template = state.template || "classic";
+    state.template = state.template || DEFAULT_TEMPLATE;
+    state.profileShape = state.profileShape || "circle";
     state.font = state.font || "DM Sans";
     state.background = state.background || "#e6f1dc";
     state.radius = Number.isFinite(state.radius) ? state.radius : 8;
@@ -333,6 +335,7 @@ function applyPage(page) {
     if ($("#interests")) $("#interests").value = page.interests || "";
     if ($("#location")) $("#location").value = page.location || "";
     if ($("#pageTitle")) $("#pageTitle").value = page.pageTitle || "";
+    if ($("#avatarShape")) $("#avatarShape").value = state.profileShape;
     if ($("#visibility")) $("#visibility").checked = page.visibility !== false;
     if ($("#ctaEnabled")) $("#ctaEnabled").checked = page.ctaEnabled !== false;
     if ($("#ctaTitle")) $("#ctaTitle").value = page.ctaTitle || "Let's Connect";
@@ -406,7 +409,7 @@ function addPage() {
     pageTitle: "",
     visibility: true,
     settings: {
-      template: "classic",
+      template: DEFAULT_TEMPLATE,
       font: "DM Sans",
       background: "#e6f1dc",
       radius: 8,
@@ -614,6 +617,9 @@ function syncAll() {
   const bg = state.profileImage ? `url('${state.profileImage}')` : "";
   $("#editorAvatar").style.backgroundImage = bg;
   $(".phone-avatar").style.backgroundImage = bg;
+  const avatarShape = state.profileShape || "circle";
+  $("#editorAvatar").dataset.shape = avatarShape;
+  $(".phone-avatar").dataset.shape = avatarShape;
   $("#phonePage").className =
     `phone-page ${state.template === "classic" ? "" : "template-" + state.template}`;
   $("#phonePage").style.fontFamily = `'${state.font || "DM Sans"}', sans-serif`;
@@ -624,6 +630,11 @@ function syncAll() {
     .querySelectorAll(".swatch[data-bg]")
     .forEach((item) =>
       item.classList.toggle("active", item.dataset.bg === state.background),
+    );
+  document
+    .querySelectorAll("#templateGrid .template")
+    .forEach((item) =>
+      item.classList.toggle("active", item.dataset.template === state.template),
     );
   document
     .querySelectorAll(".link-color")
@@ -805,6 +816,14 @@ function getService(url) {
     ) || "website"
   );
 }
+function getLinkDomain(url) {
+  try {
+    const normalized = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    return new URL(normalized).hostname.replace(/^www\./i, "");
+  } catch {
+    return "";
+  }
+}
 function getIcon(link, linkStyle = state.linkStyle) {
   const currentLinkStyle = linkStyle || state.linkStyle || {};
   const treatment = `icon-${currentLinkStyle.iconTreatment || "plain"}`;
@@ -813,15 +832,31 @@ function getIcon(link, linkStyle = state.linkStyle) {
     const escapedUrl = link.customImage.replace(/'/g, "\\'");
     return `<i class="link-symbol ${treatment}" style="background-image:url('${escapedUrl}');background-size:cover;background-position:center;color:transparent">IMG</i>`;
   }
+  if (link.iconMode !== "image") {
+    const domain = getLinkDomain(link.url || "");
+    if (domain) {
+      const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
+      const fallbackIcon = services[getService(link.url)] || services.website;
+      return `<span class="link-symbol favicon-symbol ${treatment}"><img src="${faviconUrl}" alt="" /><i class="favicon-fallback ${fallbackIcon}"></i></span>`;
+    }
+  }
   return link.iconMode === "image"
     ? `<i class="link-symbol ${treatment} fa-solid fa-image"></i>`
     : `<i class="link-symbol ${treatment} ${services[getService(link.url)] || services.website}"></i>`;
 }
+document.addEventListener(
+  "error",
+  (event) => {
+    const image = event.target.closest?.(".favicon-symbol img");
+    if (image) image.parentElement.classList.add("favicon-failed");
+  },
+  true,
+);
 function renderLinks() {
   $("#linkList").innerHTML = state.links
     .map(
       (link, index) =>
-        `<div class="link-row" data-index="${index}"><span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span><div class="link-content"><input class="link-title" value="${escapeHtml(link.title)}" data-index="${index}" data-key="title" placeholder="Link title" aria-label="Link title" /><input class="link-desc" value="${escapeHtml(link.description || "")}" data-index="${index}" data-key="description" placeholder="Subtitle / description (optional)" aria-label="Link description" /><input class="link-url" value="${escapeHtml(link.url)}" data-index="${index}" data-key="url" placeholder="URL" aria-label="Link URL" /></div><input class="toggle" type="checkbox" ${link.enabled ? "checked" : ""} data-index="${index}" data-key="enabled" aria-label="Enable link"/><button class="icon-btn danger" data-delete="${index}" aria-label="Delete link" title="Delete link"><i class="fa-solid fa-xmark"></i></button><div class="link-options"><select data-index="${index}" data-key="iconMode" aria-label="Link icon style"><option value="auto" ${link.iconMode === "auto" ? "selected" : ""}>Auto icon</option><option value="image" ${link.iconMode === "image" ? "selected" : ""}>Custom image</option><option value="none" ${link.iconMode === "none" ? "selected" : ""}>No icon</option></select>${link.iconMode === "image" ? `<button class="mini-action" type="button" data-upload="${index}">${link.customImage ? "Change image" : "Choose image"}</button>` : ""}</div></div>`,
+        `<div class="link-row" data-index="${index}"><span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span><div class="link-content"><input class="link-title" value="${escapeHtml(link.title)}" data-index="${index}" data-key="title" placeholder="New link" aria-label="Link title" /><input class="link-desc" value="${escapeHtml(link.description || "")}" data-index="${index}" data-key="description" placeholder="Subtitle / description (optional)" aria-label="Link description" /><input class="link-url" value="${escapeHtml(link.url)}" data-index="${index}" data-key="url" placeholder="https://" aria-label="Link URL" /></div><input class="toggle" type="checkbox" ${link.enabled ? "checked" : ""} data-index="${index}" data-key="enabled" aria-label="Enable link"/><button class="icon-btn danger" data-delete="${index}" aria-label="Delete link" title="Delete link"><i class="fa-solid fa-xmark"></i></button><div class="link-options"><select data-index="${index}" data-key="iconMode" aria-label="Link icon style"><option value="auto" ${link.iconMode === "auto" ? "selected" : ""}>Auto icon</option><option value="image" ${link.iconMode === "image" ? "selected" : ""}>Custom image</option><option value="none" ${link.iconMode === "none" ? "selected" : ""}>No icon</option></select>${link.iconMode === "image" ? `<button class="mini-action" type="button" data-upload="${index}">${link.customImage ? "Change image" : "Choose image"}</button>` : ""}</div></div>`,
     )
     .join("");
   $("#phoneLinks").innerHTML = state.links
@@ -1084,11 +1119,17 @@ $("#font").addEventListener("change", (event) => {
   $("#phonePage").style.fontFamily = `'${state.font}', sans-serif`;
   queueSave();
 });
+$("#avatarShape").addEventListener("change", (event) => {
+  state.profileShape = event.target.value;
+  syncAll();
+  queueSave();
+});
 $("#radius").addEventListener("input", (event) => {
   state.radius = Number(event.target.value);
   document
     .querySelectorAll(".phone-link")
     .forEach((link) => (link.style.borderRadius = `${event.target.value}px`));
+  renderPreviewDetails();
   queueSave();
 });
 document.querySelectorAll(".link-color").forEach((button) =>
@@ -1098,6 +1139,7 @@ document.querySelectorAll(".link-color").forEach((button) =>
       .querySelectorAll(".link-color")
       .forEach((item) => item.classList.toggle("active", item === button));
     renderLinks();
+    renderPreviewDetails();
     queueSave();
   }),
 );
@@ -1222,8 +1264,8 @@ $("#logoUpload").addEventListener("change", async (event) => {
 });
 $("#addLink").addEventListener("click", () => {
   state.links.push({
-    title: "New link",
-    url: "https://",
+    title: "",
+    url: "",
     enabled: true,
     iconMode: "auto",
   });
@@ -1267,7 +1309,6 @@ function setupReorderableList(
   isSocial = false,
 ) {
   let draggedIndex = null;
-  let dragGhost = null;
   listEl.addEventListener("pointerdown", (event) => {
     const grip = event.target.closest(".grip");
     if (!grip) return;
@@ -1283,25 +1324,12 @@ function setupReorderableList(
     draggedIndex = Number(
       isSocial ? row.dataset.socialIndex : row.dataset.index,
     );
-    const titleEl = row.querySelector(".link-title");
-    const titleText = titleEl
-      ? titleEl.value ||
-        (titleEl.options ? titleEl.options[titleEl.selectedIndex]?.text : "") ||
-        "Link"
-      : "Link";
-    dragGhost = document.createElement("div");
-    dragGhost.className = "drag-ghost-preview";
-    dragGhost.innerHTML = `<i class="fa-solid fa-grip-vertical"></i><span>${titleText}</span>`;
-    document.body.appendChild(dragGhost);
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", String(draggedIndex));
     if (event.dataTransfer.setDragImage) {
-      event.dataTransfer.setDragImage(dragGhost, 20, 18);
+      event.dataTransfer.setDragImage(row, event.offsetX, event.offsetY);
     }
-    setTimeout(() => {
-      row.classList.add("is-dragging");
-      if (dragGhost && dragGhost.parentNode) dragGhost.remove();
-    }, 0);
+    row.classList.add("is-dragging");
   });
   listEl.addEventListener("dragover", (event) => {
     event.preventDefault();
@@ -1369,7 +1397,6 @@ function setupReorderableList(
       );
       r.setAttribute("draggable", "false");
     });
-    if (dragGhost && dragGhost.parentNode) dragGhost.remove();
     draggedIndex = null;
   });
 }
@@ -1593,6 +1620,7 @@ function renderPublicProfile(profile) {
   if (pageSettings.profileImage) {
     const avatar = document.createElement("div");
     avatar.className = "public-profile-avatar";
+    avatar.dataset.shape = pageSettings.profileShape || "circle";
     avatar.style.backgroundImage = `url('${pageSettings.profileImage}')`;
     inner.append(avatar);
   }
