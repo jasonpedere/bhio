@@ -281,13 +281,82 @@
           </div>
           <div class="fields profile-extra-fields">
             <div class="field">
-              <label for="bio">Bio</label
+              <label for="headline">Headline</label>
+              <input id="headline" placeholder="e.g. Founder • Developer • Rider" />
+            </div>
+            <div class="field">
+              <label for="occupation">Occupation</label>
+              <input id="occupation" placeholder="e.g. Founder / Developer / Entrepreneur" />
+            </div>
+            <div class="field">
+              <label for="tagline">Tagline</label>
+              <input id="tagline" placeholder="e.g. Build. Earn. Explore." />
+            </div>
+            <div class="field">
+              <label for="bio">Short Bio</label
               ><textarea id="bio">
 Photographer, creative director, and collector of small beautiful things.</textarea>
             </div>
             <div class="field">
               <label for="location">Location (optional)</label
               ><input id="location" value="New York, NY" />
+            </div>
+          </div>
+        </section>
+        <section class="section" id="aboutSection">
+          <div class="section-head">
+            <span class="section-title">About Me</span>
+            <span class="edit-hint">Your story & background</span>
+          </div>
+          <div class="fields">
+            <div class="field">
+              <label for="aboutMe">Long Bio / Story</label>
+              <textarea id="aboutMe" rows="5" placeholder="Share your journey, mission, and what you're building..."></textarea>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="interestsSection">
+          <div class="section-head">
+            <span class="section-title">Interests & Topics</span>
+            <span class="edit-hint">Separated by • or comma</span>
+          </div>
+          <div class="fields">
+            <div class="field">
+              <label for="interests">Interests</label>
+              <input id="interests" placeholder="Technology • Startups • Food Delivery • Business • Motorcycles • Travel" />
+            </div>
+          </div>
+        </section>
+        <section class="section" id="ctaSection">
+          <div class="section-head">
+            <span class="section-title">Profile CTA</span>
+            <span class="edit-hint">Direct connection card</span>
+          </div>
+          <div class="settings-toggle-row" style="margin-bottom: 14px;">
+            <div>
+              <strong class="settings-toggle-label">Show CTA Card</strong>
+              <div class="settings-toggle-preview">Display a contact / connect card on your page</div>
+            </div>
+            <input class="toggle" id="ctaEnabled" type="checkbox" checked aria-label="Enable CTA Card" />
+          </div>
+          <div class="fields cta-fields" id="ctaFields">
+            <div class="field">
+              <label for="ctaTitle">Card Title</label>
+              <input id="ctaTitle" value="Let's Connect" />
+            </div>
+            <div class="field">
+              <label for="ctaDesc">Description</label>
+              <textarea id="ctaDesc" rows="2">Have an idea, business opportunity, or just want to say hello? Send me a message.</textarea>
+            </div>
+            <div class="fields-row cta-row-2col">
+              <div class="field">
+                <label for="ctaButtonText">Button Label</label>
+                <input id="ctaButtonText" value="Send a message" />
+              </div>
+              <div class="field">
+                <label for="ctaButtonUrl">Button Link</label>
+                <input id="ctaButtonUrl" value="https://m.me/jasonpedere" placeholder="mailto: or https://" />
+              </div>
             </div>
           </div>
         </section>
@@ -501,12 +570,20 @@ Photographer, creative director, and collector of small beautiful things.</texta
             ></div>
             <h2 class="phone-name" data-focus="displayName">Tessa Lee</h2>
             <p class="phone-handle" id="phoneHandle">@tessalee</p>
+            <div class="phone-headline" id="phoneHeadline" data-focus="headline"></div>
+            <div class="phone-tagline" id="phoneTagline" data-focus="tagline"></div>
             <p class="phone-bio" data-focus="bio">
               Photographer, creative director, and collector of small beautiful
               things.
             </p>
-            <p class="phone-location" id="phoneLocation">New York, NY</p>
+            <div class="phone-chips" id="phoneChips">
+              <span class="phone-chip phone-occupation" id="phoneOccupation" data-focus="occupation"><i class="fa-solid fa-briefcase"></i><span class="chip-text"></span></span>
+              <span class="phone-chip phone-location" id="phoneLocation" data-focus="location"><i class="fa-solid fa-location-dot"></i><span class="chip-text">New York, NY</span></span>
+            </div>
+            <div class="phone-interests" id="phoneInterests" data-focus="interests"></div>
+            <div class="phone-about" id="phoneAbout" data-focus="aboutMe"></div>
             <div class="phone-links" id="phoneLinks"></div>
+            <div class="phone-cta" id="phoneCta" data-focus="cta"></div>
             <div class="phone-socials" id="phoneSocials"></div>
             <a href="/" class="phone-footer" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">Bhio</a>
           </div>

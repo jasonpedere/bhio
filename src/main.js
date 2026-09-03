@@ -76,16 +76,133 @@ const state = {
     { service: "linkedin", handle: "tessa-lee", enabled: true },
   ],
 };
+const $ = (selector) => document.querySelector(selector);
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 const MAX_PAGES = 3;
 let pages = [];
 let currentPageIndex = 0;
 const inputMap = {
   displayName: [".phone-name"],
   username: ["#phoneHandle"],
-  bio: [".phone-bio"],
-  location: ["#phoneLocation"],
 };
-const $ = (selector) => document.querySelector(selector);
+function renderPreviewDetails() {
+  const headlineEl = $("#phoneHeadline");
+  const headlineVal = $("#headline") ? $("#headline").value.trim() : "";
+  if (headlineEl) {
+    headlineEl.textContent = headlineVal;
+    headlineEl.style.display = headlineVal ? "block" : "none";
+  }
+
+  const taglineEl = $("#phoneTagline");
+  const taglineVal = $("#tagline") ? $("#tagline").value.trim() : "";
+  if (taglineEl) {
+    if (taglineVal) {
+      taglineEl.innerHTML = `<span class="tagline-pill"><i class="fa-solid fa-sparkles"></i> ${escapeHtml(taglineVal)}</span>`;
+      taglineEl.style.display = "block";
+    } else {
+      taglineEl.innerHTML = "";
+      taglineEl.style.display = "none";
+    }
+  }
+
+  const bioEl = $(".phone-bio");
+  const bioVal = $("#bio") ? $("#bio").value.trim() : "";
+  if (bioEl) {
+    bioEl.textContent = bioVal;
+    bioEl.style.display = bioVal ? "block" : "none";
+  }
+
+  const occVal = $("#occupation") ? $("#occupation").value.trim() : "";
+  const locVal = $("#location") ? $("#location").value.trim() : "";
+  const occEl = $("#phoneOccupation");
+  const locEl = $("#phoneLocation");
+  const chipsEl = $("#phoneChips");
+
+  if (occEl) {
+    const chipText = occEl.querySelector(".chip-text");
+    if (chipText) chipText.textContent = occVal;
+    occEl.style.display = occVal ? "inline-flex" : "none";
+  }
+  if (locEl) {
+    const chipText = locEl.querySelector(".chip-text");
+    if (chipText) chipText.textContent = locVal;
+    locEl.style.display = locVal ? "inline-flex" : "none";
+  }
+  if (chipsEl) {
+    chipsEl.style.display = occVal || locVal ? "flex" : "none";
+  }
+
+  const interestsEl = $("#phoneInterests");
+  const interestsVal = $("#interests") ? $("#interests").value.trim() : "";
+  if (interestsEl) {
+    if (interestsVal) {
+      const tags = interestsVal
+        .split(/[•,|]+/)
+        .map((t) => t.trim())
+        .filter(Boolean);
+      interestsEl.innerHTML = tags
+        .map((t) => `<span class="interest-pill">${escapeHtml(t)}</span>`)
+        .join("");
+      interestsEl.style.display = tags.length ? "flex" : "none";
+    } else {
+      interestsEl.innerHTML = "";
+      interestsEl.style.display = "none";
+    }
+  }
+
+  const aboutEl = $("#phoneAbout");
+  const aboutVal = $("#aboutMe") ? $("#aboutMe").value.trim() : "";
+  if (aboutEl) {
+    if (aboutVal) {
+      const paragraphs = aboutVal
+        .split(/\n\s*\n/)
+        .map((p) => `<p>${escapeHtml(p.trim())}</p>`)
+        .join("");
+      aboutEl.innerHTML = `
+        <div class="phone-about-card">
+          <div class="phone-about-header"><i class="fa-solid fa-address-card"></i><span>About Me</span></div>
+          <div class="phone-about-body">${paragraphs}</div>
+        </div>`;
+      aboutEl.style.display = "block";
+    } else {
+      aboutEl.innerHTML = "";
+      aboutEl.style.display = "none";
+    }
+  }
+
+  const ctaEl = $("#phoneCta");
+  const ctaEnabled = $("#ctaEnabled") ? $("#ctaEnabled").checked : false;
+  const ctaTitle = $("#ctaTitle") ? $("#ctaTitle").value.trim() : "";
+  const ctaDesc = $("#ctaDesc") ? $("#ctaDesc").value.trim() : "";
+  const ctaBtnText = $("#ctaButtonText") ? $("#ctaButtonText").value.trim() : "Send a message";
+  const ctaBtnUrl = $("#ctaButtonUrl") ? $("#ctaButtonUrl").value.trim() : "";
+
+  if (ctaEl) {
+    if (ctaEnabled && (ctaTitle || ctaDesc)) {
+      ctaEl.innerHTML = `
+        <div class="phone-cta-card">
+          <div class="phone-cta-top">
+            <span class="phone-cta-badge"><i class="fa-solid fa-paper-plane"></i> Let's Connect</span>
+          </div>
+          ${ctaTitle ? `<h4 class="phone-cta-title">${escapeHtml(ctaTitle)}</h4>` : ""}
+          ${ctaDesc ? `<p class="phone-cta-desc">${escapeHtml(ctaDesc)}</p>` : ""}
+          ${ctaBtnUrl ? `<a class="phone-cta-btn" href="${ctaBtnUrl}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(ctaBtnText || "Send a message")}</span><i class="fa-solid fa-arrow-right"></i></a>` : ""}
+        </div>`;
+      ctaEl.style.display = "block";
+    } else {
+      ctaEl.innerHTML = "";
+      ctaEl.style.display = "none";
+    }
+  }
+}
 const fontControl = document.createElement("div");
 fontControl.className = "control";
 fontControl.style.marginBottom = "22px";
@@ -146,12 +263,22 @@ let authMode = "login";
 let isApplyingProfile = false;
 function capturePage() {
   return {
-    displayName: $("#displayName").value,
-    username: $("#username").value,
-    bio: $("#bio").value,
-    location: $("#location").value,
-    pageTitle: $("#pageTitle").value,
-    visibility: $("#visibility").checked,
+    displayName: $("#displayName") ? $("#displayName").value : "",
+    username: $("#username") ? $("#username").value : "",
+    headline: $("#headline") ? $("#headline").value : "",
+    occupation: $("#occupation") ? $("#occupation").value : "",
+    tagline: $("#tagline") ? $("#tagline").value : "",
+    bio: $("#bio") ? $("#bio").value : "",
+    aboutMe: $("#aboutMe") ? $("#aboutMe").value : "",
+    interests: $("#interests") ? $("#interests").value : "",
+    location: $("#location") ? $("#location").value : "",
+    pageTitle: $("#pageTitle") ? $("#pageTitle").value : "",
+    visibility: $("#visibility") ? $("#visibility").checked : true,
+    ctaEnabled: $("#ctaEnabled") ? $("#ctaEnabled").checked : true,
+    ctaTitle: $("#ctaTitle") ? $("#ctaTitle").value : "Let's Connect",
+    ctaDesc: $("#ctaDesc") ? $("#ctaDesc").value : "",
+    ctaButtonText: $("#ctaButtonText") ? $("#ctaButtonText").value : "Send a message",
+    ctaButtonUrl: $("#ctaButtonUrl") ? $("#ctaButtonUrl").value : "",
     settings: JSON.parse(JSON.stringify(state)),
   };
 }
@@ -196,12 +323,22 @@ function applyPage(page) {
     };
     state.links = Array.isArray(state.links) ? state.links : [];
     state.socials = Array.isArray(state.socials) ? state.socials : [];
-    $("#displayName").value = page.displayName || "";
-    $("#username").value = page.username || "";
-    $("#bio").value = page.bio || "";
-    $("#location").value = page.location || "";
-    $("#pageTitle").value = page.pageTitle || "";
-    $("#visibility").checked = page.visibility !== false;
+    if ($("#displayName")) $("#displayName").value = page.displayName || "";
+    if ($("#username")) $("#username").value = page.username || "";
+    if ($("#headline")) $("#headline").value = page.headline || "";
+    if ($("#occupation")) $("#occupation").value = page.occupation || "";
+    if ($("#tagline")) $("#tagline").value = page.tagline || "";
+    if ($("#bio")) $("#bio").value = page.bio || "";
+    if ($("#aboutMe")) $("#aboutMe").value = page.aboutMe || "";
+    if ($("#interests")) $("#interests").value = page.interests || "";
+    if ($("#location")) $("#location").value = page.location || "";
+    if ($("#pageTitle")) $("#pageTitle").value = page.pageTitle || "";
+    if ($("#visibility")) $("#visibility").checked = page.visibility !== false;
+    if ($("#ctaEnabled")) $("#ctaEnabled").checked = page.ctaEnabled !== false;
+    if ($("#ctaTitle")) $("#ctaTitle").value = page.ctaTitle || "Let's Connect";
+    if ($("#ctaDesc")) $("#ctaDesc").value = page.ctaDesc !== undefined ? page.ctaDesc : "Have an idea, business opportunity, or just want to say hello? Send me a message.";
+    if ($("#ctaButtonText")) $("#ctaButtonText").value = page.ctaButtonText || "Send a message";
+    if ($("#ctaButtonUrl")) $("#ctaButtonUrl").value = page.ctaButtonUrl || "";
     syncAll();
     renderPageSwitcher();
     checkUsernameAvailability(page.username || $("#username").value);
@@ -405,7 +542,7 @@ $("#deleteConfirm").addEventListener("click", async () => {
 async function loadProfile(user) {
   const { data, error } = await supabaseClient
     .from("profiles")
-    .select("display_name,username,bio,location,page_title,visibility,settings")
+    .select("*")
     .eq("id", user.id)
     .maybeSingle();
   if (error) throw error;
@@ -423,24 +560,43 @@ async function loadProfile(user) {
     (!firstPage?.settings?.links || firstPage.settings.links.length === 0);
   if (hasSavedPages && !isCompletelyBlank) {
     pages = data.settings.pages.slice(0, MAX_PAGES);
+    if (pages[0]) {
+      if (data.headline && !pages[0].headline) pages[0].headline = data.headline;
+      if (data.occupation && !pages[0].occupation) pages[0].occupation = data.occupation;
+      if (data.tagline && !pages[0].tagline) pages[0].tagline = data.tagline;
+      if (data.about_me && !pages[0].aboutMe) pages[0].aboutMe = data.about_me;
+      if (data.interests && !pages[0].interests) pages[0].interests = data.interests;
+      if (data.cta_title && !pages[0].ctaTitle) pages[0].ctaTitle = data.cta_title;
+      if (data.cta_desc && !pages[0].ctaDesc) pages[0].ctaDesc = data.cta_desc;
+      if (data.cta_button_text && !pages[0].ctaButtonText) pages[0].ctaButtonText = data.cta_button_text;
+      if (data.cta_button_url && !pages[0].ctaButtonUrl) pages[0].ctaButtonUrl = data.cta_button_url;
+    }
   } else {
     const draftRestored = restoreDraft();
     if (!draftRestored) {
       pages = [
         {
           name: "Page 1",
-          displayName: data.display_name || "Tessa Lee",
+          displayName: data.display_name || "Jason Pedere",
           username: data.username
             ? `@${data.username}`
             : user.user_metadata?.username
               ? `@${user.user_metadata.username}`
-              : "@tessalee",
-          bio:
-            data.bio ||
-            "Photographer, creative director, and collector of small beautiful things.",
-          location: data.location || "New York, NY",
-          pageTitle: data.page_title || "Tessa Lee - Photographer",
+              : "@jason",
+          headline: data.headline || "",
+          occupation: data.occupation || "",
+          tagline: data.tagline || "",
+          bio: data.bio || "",
+          aboutMe: data.about_me || "",
+          interests: data.interests || "",
+          location: data.location || "",
+          pageTitle: data.page_title || "",
           visibility: data.visibility !== false,
+          ctaEnabled: data.cta_enabled !== false,
+          ctaTitle: data.cta_title || "Let's Connect",
+          ctaDesc: data.cta_desc || "",
+          ctaButtonText: data.cta_button_text || "Send a message",
+          ctaButtonUrl: data.cta_button_url || "",
           settings: JSON.parse(JSON.stringify(state)),
         },
       ];
@@ -452,8 +608,9 @@ async function loadProfile(user) {
 function syncAll() {
   Object.keys(inputMap).forEach((id) => {
     const input = $(`#${id}`);
-    input.dispatchEvent(new Event("input"));
+    if (input) input.dispatchEvent(new Event("input"));
   });
+  renderPreviewDetails();
   const bg = state.profileImage ? `url('${state.profileImage}')` : "";
   $("#editorAvatar").style.backgroundImage = bg;
   $(".phone-avatar").style.backgroundImage = bg;
@@ -506,18 +663,44 @@ async function saveProfile() {
     ? rawUsername
     : user.user_metadata?.username ||
       `user_${user.id.replace(/-/g, "").slice(0, 8)}`;
-  const payload = {
+  const extendedPayload = {
     id: user.id,
     display_name: (page.displayName || "").trim(),
     username: validUsername,
+    headline: (page.headline || "").trim(),
+    occupation: (page.occupation || "").trim(),
+    tagline: (page.tagline || "").trim(),
     bio: (page.bio || "").trim(),
+    about_me: (page.aboutMe || "").trim(),
+    interests: (page.interests || "").trim(),
     location: (page.location || "").trim(),
     page_title: (page.pageTitle || "").trim(),
     visibility: page.visibility !== false,
+    cta_enabled: page.ctaEnabled !== false,
+    cta_title: (page.ctaTitle || "").trim(),
+    cta_desc: (page.ctaDesc || "").trim(),
+    cta_button_text: (page.ctaButtonText || "").trim(),
+    cta_button_url: (page.ctaButtonUrl || "").trim(),
     settings: { pages },
     updated_at: new Date().toISOString(),
   };
-  const { error } = await supabaseClient.from("profiles").upsert(payload);
+  let { error } = await supabaseClient.from("profiles").upsert(extendedPayload);
+  if (error) {
+    // If table has not run the new migration yet, fallback to base columns
+    const basePayload = {
+      id: user.id,
+      display_name: (page.displayName || "").trim(),
+      username: validUsername,
+      bio: (page.bio || "").trim(),
+      location: (page.location || "").trim(),
+      page_title: (page.pageTitle || "").trim(),
+      visibility: page.visibility !== false,
+      settings: { pages },
+      updated_at: new Date().toISOString(),
+    };
+    const fallback = await supabaseClient.from("profiles").upsert(basePayload);
+    error = fallback.error;
+  }
   if (error) {
     console.error("Could not save profile:", error);
     setSaveStatus("Saved locally; sync pending");
@@ -638,16 +821,21 @@ function renderLinks() {
   $("#linkList").innerHTML = state.links
     .map(
       (link, index) =>
-        `<div class="link-row" data-index="${index}"><span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span><div class="link-content"><input class="link-title" value="${link.title}" data-index="${index}" data-key="title" aria-label="Link title" /><input class="link-url" value="${link.url}" data-index="${index}" data-key="url" aria-label="Link URL" /></div><input class="toggle" type="checkbox" ${link.enabled ? "checked" : ""} data-index="${index}" data-key="enabled" aria-label="Enable link"/><button class="icon-btn danger" data-delete="${index}" aria-label="Delete link" title="Delete link"><i class="fa-solid fa-xmark"></i></button><div class="link-options"><select data-index="${index}" data-key="iconMode" aria-label="Link icon style"><option value="auto" ${link.iconMode === "auto" ? "selected" : ""}>Auto icon</option><option value="image" ${link.iconMode === "image" ? "selected" : ""}>Custom image</option><option value="none" ${link.iconMode === "none" ? "selected" : ""}>No icon</option></select>${link.iconMode === "image" ? `<button class="mini-action" type="button" data-upload="${index}">${link.customImage ? "Change image" : "Choose image"}</button>` : ""}</div></div>`,
+        `<div class="link-row" data-index="${index}"><span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span><div class="link-content"><input class="link-title" value="${escapeHtml(link.title)}" data-index="${index}" data-key="title" placeholder="Link title" aria-label="Link title" /><input class="link-desc" value="${escapeHtml(link.description || "")}" data-index="${index}" data-key="description" placeholder="Subtitle / description (optional)" aria-label="Link description" /><input class="link-url" value="${escapeHtml(link.url)}" data-index="${index}" data-key="url" placeholder="URL" aria-label="Link URL" /></div><input class="toggle" type="checkbox" ${link.enabled ? "checked" : ""} data-index="${index}" data-key="enabled" aria-label="Enable link"/><button class="icon-btn danger" data-delete="${index}" aria-label="Delete link" title="Delete link"><i class="fa-solid fa-xmark"></i></button><div class="link-options"><select data-index="${index}" data-key="iconMode" aria-label="Link icon style"><option value="auto" ${link.iconMode === "auto" ? "selected" : ""}>Auto icon</option><option value="image" ${link.iconMode === "image" ? "selected" : ""}>Custom image</option><option value="none" ${link.iconMode === "none" ? "selected" : ""}>No icon</option></select>${link.iconMode === "image" ? `<button class="mini-action" type="button" data-upload="${index}">${link.customImage ? "Change image" : "Choose image"}</button>` : ""}</div></div>`,
     )
     .join("");
   $("#phoneLinks").innerHTML = state.links
     .map((link, index) => {
       const icon = getIcon(link);
+      const titleHtml = `<div class="link-title-text">${escapeHtml(link.title)}</div>`;
+      const descHtml = link.description
+        ? `<div class="link-desc-text">${escapeHtml(link.description)}</div>`
+        : "";
+      const textBlock = `<div class="link-text-block">${titleHtml}${descHtml}</div>`;
       const content =
         state.linkStyle.iconPosition === "right"
-          ? `<span>${link.title}</span>${icon}`
-          : `${icon}<span>${link.title}</span>`;
+          ? `${textBlock}${icon}`
+          : `${icon}${textBlock}`;
       const isDark = state.linkStyle.color === "#172219";
       return `<button class="phone-link content-${state.linkStyle.align} ${link.enabled ? "" : "off"}" style="background:${state.linkStyle.color};${isDark ? "color:#fff;border-color:rgba(255,255,255,0.14);" : ""}" data-focus="link-${index}">${content}</button>`;
     })
@@ -775,9 +963,13 @@ async function checkUsernameAvailability(rawVal) {
 function syncInput(event) {
   const input = event.target;
   const fields = inputMap[input.id];
-  if (!fields) return;
+  if (fields) {
+    fields.forEach((selector) => {
+      const el = $(selector);
+      if (el) el.textContent = input.value;
+    });
+  }
   if (input.matches("textarea")) autoResizeTextarea(input);
-  fields.forEach((selector) => ($(selector).textContent = input.value));
   if (input.id === "username") {
     const clean = input.value.replace(/^@/, "");
     $("#previewUrl").textContent = `bhio.link/${clean}`;
@@ -788,13 +980,40 @@ function syncInput(event) {
       checkUsernameAvailability(input.value);
     }, 280);
   }
+  renderPreviewDetails();
 }
-Object.keys(inputMap).forEach((id) =>
-  $(`#${id}`).addEventListener("input", syncInput),
-);
-["displayName", "username", "bio", "location", "pageTitle"].forEach((id) =>
-  $(`#${id}`).addEventListener("input", queueSave),
-);
+Object.keys(inputMap).forEach((id) => {
+  const el = $(`#${id}`);
+  if (el) el.addEventListener("input", syncInput);
+});
+[
+  "displayName",
+  "username",
+  "headline",
+  "occupation",
+  "tagline",
+  "bio",
+  "aboutMe",
+  "interests",
+  "location",
+  "pageTitle",
+  "ctaTitle",
+  "ctaDesc",
+  "ctaButtonText",
+  "ctaButtonUrl",
+].forEach((id) => {
+  const el = $(`#${id}`);
+  if (el) {
+    el.addEventListener("input", syncInput);
+    el.addEventListener("input", queueSave);
+  }
+});
+if ($("#ctaEnabled")) {
+  $("#ctaEnabled").addEventListener("change", () => {
+    renderPreviewDetails();
+    queueSave();
+  });
+}
 $("#username").addEventListener("blur", () =>
   checkUsernameAvailability($("#username").value),
 );
@@ -912,11 +1131,25 @@ $("#linkList").addEventListener("input", (event) => {
   const { index, key } = event.target.dataset;
   if (index === undefined) return;
   state.links[index][key] = event.target.value;
-  if (key === "title") {
-    const label = document.querySelector(
-      `#phoneLinks .phone-link[data-focus="link-${index}"] span`,
+  if (key === "title" || key === "description") {
+    const card = document.querySelector(
+      `#phoneLinks .phone-link[data-focus="link-${index}"]`,
     );
-    if (label) label.textContent = event.target.value;
+    if (card) {
+      const titleSpan = card.querySelector(".link-title-text");
+      const descSpan = card.querySelector(".link-desc-text");
+      if (key === "title" && titleSpan) titleSpan.textContent = event.target.value;
+      if (key === "description") {
+        if (descSpan) {
+          descSpan.textContent = event.target.value;
+          descSpan.style.display = event.target.value ? "block" : "none";
+        } else {
+          renderLinks();
+        }
+      }
+    } else {
+      renderLinks();
+    }
   }
   queueSave();
 });
@@ -1306,10 +1539,29 @@ function renderPublicProfile(profile) {
       : {
           displayName: profile.display_name,
           username: `@${profile.username}`,
-          bio: profile.bio,
-          location: profile.location,
+          headline: profile.headline || "",
+          occupation: profile.occupation || "",
+          tagline: profile.tagline || "",
+          bio: profile.bio || "",
+          aboutMe: profile.about_me || "",
+          interests: profile.interests || "",
+          location: profile.location || "",
+          ctaEnabled: profile.cta_enabled !== false,
+          ctaTitle: profile.cta_title || "Let's Connect",
+          ctaDesc: profile.cta_desc || "",
+          ctaButtonText: profile.cta_button_text || "Send a message",
+          ctaButtonUrl: profile.cta_button_url || "",
           settings,
         };
+  if (!page.headline && profile.headline) page.headline = profile.headline;
+  if (!page.occupation && profile.occupation) page.occupation = profile.occupation;
+  if (!page.tagline && profile.tagline) page.tagline = profile.tagline;
+  if (!page.aboutMe && profile.about_me) page.aboutMe = profile.about_me;
+  if (!page.interests && profile.interests) page.interests = profile.interests;
+  if (!page.ctaTitle && profile.cta_title) page.ctaTitle = profile.cta_title;
+  if (!page.ctaDesc && profile.cta_desc) page.ctaDesc = profile.cta_desc;
+  if (!page.ctaButtonText && profile.cta_button_text) page.ctaButtonText = profile.cta_button_text;
+  if (!page.ctaButtonUrl && profile.cta_button_url) page.ctaButtonUrl = profile.cta_button_url;
   const pageSettings = page.settings || settings;
   const background = pageSettings.background || "#e6f1dc";
   const font = pageSettings.font || "DM Sans";
@@ -1352,18 +1604,81 @@ function renderPublicProfile(profile) {
   handle.className = "public-profile-handle";
   handle.textContent = `@${(page.username || profile.username).replace(/^@/, "")}`;
   inner.append(handle);
+
+  if (page.headline) {
+    const headline = document.createElement("div");
+    headline.className = "public-profile-headline";
+    headline.textContent = page.headline;
+    inner.append(headline);
+  }
+
+  if (page.tagline) {
+    const tagline = document.createElement("div");
+    tagline.className = "public-profile-tagline";
+    tagline.innerHTML = `<span class="tagline-pill"><i class="fa-solid fa-sparkles"></i> ${escapeHtml(page.tagline)}</span>`;
+    inner.append(tagline);
+  }
+
   if (page.bio || profile.bio) {
     const bio = document.createElement("p");
     bio.className = "public-profile-bio";
     bio.textContent = page.bio || profile.bio;
     inner.append(bio);
   }
-  if (page.location || profile.location) {
-    const location = document.createElement("p");
-    location.className = "public-profile-location";
-    location.textContent = page.location || profile.location;
-    inner.append(location);
+
+  const hasOcc = Boolean(page.occupation);
+  const hasLoc = Boolean(page.location || profile.location);
+  if (hasOcc || hasLoc) {
+    const chips = document.createElement("div");
+    chips.className = "public-profile-chips";
+    if (hasOcc) {
+      const occChip = document.createElement("span");
+      occChip.className = "public-profile-chip";
+      occChip.innerHTML = `<i class="fa-solid fa-briefcase"></i><span>${escapeHtml(page.occupation)}</span>`;
+      chips.append(occChip);
+    }
+    if (hasLoc) {
+      const locChip = document.createElement("span");
+      locChip.className = "public-profile-chip";
+      locChip.innerHTML = `<i class="fa-solid fa-location-dot"></i><span>${escapeHtml(page.location || profile.location)}</span>`;
+      chips.append(locChip);
+    }
+    inner.append(chips);
   }
+
+  if (page.interests) {
+    const tags = page.interests
+      .split(/[•,|]+/)
+      .map((t) => t.trim())
+      .filter(Boolean);
+    if (tags.length) {
+      const interests = document.createElement("div");
+      interests.className = "public-profile-interests";
+      tags.forEach((tag) => {
+        const span = document.createElement("span");
+        span.className = "interest-pill";
+        span.textContent = tag;
+        interests.append(span);
+      });
+      inner.append(interests);
+    }
+  }
+
+  if (page.aboutMe) {
+    const about = document.createElement("div");
+    about.className = "public-profile-about";
+    const paragraphs = page.aboutMe
+      .split(/\n\s*\n/)
+      .map((p) => `<p>${escapeHtml(p.trim())}</p>`)
+      .join("");
+    about.innerHTML = `
+      <div class="public-profile-about-card">
+        <div class="public-profile-about-header"><i class="fa-solid fa-address-card"></i><span>About Me</span></div>
+        <div class="public-profile-about-body">${paragraphs}</div>
+      </div>`;
+    inner.append(about);
+  }
+
   const linkList = document.createElement("div");
   linkList.className = "public-profile-links";
   links.forEach((link) => {
@@ -1382,18 +1697,57 @@ function renderPublicProfile(profile) {
     }
 
     const iconHtml = getIcon(link, linkStyle);
-    const titleSpan = document.createElement("span");
-    titleSpan.textContent = link.title || href;
+    const titleEl = document.createElement("div");
+    titleEl.className = "link-title-text";
+    titleEl.textContent = link.title || href;
+
+    const textContainer = document.createElement("div");
+    textContainer.className = "link-text-block";
+    textContainer.append(titleEl);
+
+    if (link.description) {
+      const descEl = document.createElement("div");
+      descEl.className = "link-desc-text";
+      descEl.textContent = link.description;
+      textContainer.append(descEl);
+    }
 
     if (iconPosition === "right") {
-      anchor.innerHTML = `${titleSpan.outerHTML}${iconHtml}`;
+      anchor.append(textContainer);
+      if (iconHtml) {
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = iconHtml;
+        if (wrapper.firstChild) anchor.append(wrapper.firstChild);
+      }
     } else {
-      anchor.innerHTML = `${iconHtml}${titleSpan.outerHTML}`;
+      if (iconHtml) {
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = iconHtml;
+        if (wrapper.firstChild) anchor.append(wrapper.firstChild);
+      }
+      anchor.append(textContainer);
     }
 
     linkList.append(anchor);
   });
   inner.append(linkList);
+
+  const ctaEnabled = page.ctaEnabled !== false;
+  if (ctaEnabled && (page.ctaTitle || page.ctaDesc)) {
+    const cta = document.createElement("div");
+    cta.className = "public-profile-cta";
+    const ctaBtnUrl = page.ctaButtonUrl ? normalizeExternalUrl(page.ctaButtonUrl) || page.ctaButtonUrl : "";
+    cta.innerHTML = `
+      <div class="public-profile-cta-card">
+        <div class="public-profile-cta-top">
+          <span class="public-profile-cta-badge"><i class="fa-solid fa-paper-plane"></i> Let's Connect</span>
+        </div>
+        ${page.ctaTitle ? `<h3 class="public-profile-cta-title">${escapeHtml(page.ctaTitle)}</h3>` : ""}
+        ${page.ctaDesc ? `<p class="public-profile-cta-desc">${escapeHtml(page.ctaDesc)}</p>` : ""}
+        ${ctaBtnUrl ? `<a class="public-profile-cta-btn" href="${ctaBtnUrl}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(page.ctaButtonText || "Send a message")}</span><i class="fa-solid fa-arrow-right"></i></a>` : ""}
+      </div>`;
+    inner.append(cta);
+  }
   if (socials.length) {
     const socialList = document.createElement("div");
     socialList.className = "public-profile-socials";
@@ -1431,7 +1785,7 @@ async function openPublicProfile(username) {
   if (!supabaseClient) return;
   const { data, error } = await supabaseClient
     .from("profiles")
-    .select("username,display_name,bio,location,page_title,settings")
+    .select("*")
     .eq("username", username)
     .eq("visibility", true)
     .maybeSingle();
@@ -1453,17 +1807,35 @@ else {
   renderLinks();
   renderSocials();
   updateShareLinks();
-  autoResizeTextarea($("#bio"));
+  renderPreviewDetails();
+  ["bio", "aboutMe", "ctaDesc"].forEach((id) => {
+    const el = $(`#${id}`);
+    if (el) autoResizeTextarea(el);
+  });
   renderAnalytics();
   checkUsernameAvailability($("#username").value);
   restoreSession();
   updatePreviewZoom();
 }
-if ("serviceWorker" in navigator)
-  window.addEventListener("load", () =>
-    navigator.serviceWorker
-      .register("/sw.js")
-      .catch((error) =>
-        console.error("Could not register service worker:", error),
-      ),
-  );
+if ("serviceWorker" in navigator) {
+  if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (const registration of registrations) {
+        registration.unregister();
+      }
+    });
+    if ("caches" in window) {
+      caches.keys().then((names) => {
+        for (const name of names) caches.delete(name);
+      });
+    }
+  } else {
+    window.addEventListener("load", () =>
+      navigator.serviceWorker
+        .register("/sw.js")
+        .catch((error) =>
+          console.error("Could not register service worker:", error),
+        ),
+    );
+  }
+}
