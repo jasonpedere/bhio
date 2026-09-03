@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bhio | Beautiful link-in-bio pages</title>
     <meta name="theme-color" content="#005bf6" />
     <meta
@@ -282,7 +279,7 @@
               </div>
             </div>
           </div>
-          <div class="fields" style="margin-top: 17px">
+          <div class="fields profile-extra-fields">
             <div class="field">
               <label for="bio">Bio</label
               ><textarea id="bio">
@@ -305,25 +302,21 @@ Photographer, creative director, and collector of small beautiful things.</texta
               <div class="swatches">
                 <button
                   class="link-color swatch active"
-                  style="background: #ffffff"
                   data-link-color="#ffffff"
                   aria-label="White link cards"
                 ></button
                 ><button
                   class="link-color swatch"
-                  style="background: #172219"
                   data-link-color="#172219"
                   aria-label="Dark link cards"
                 ></button
                 ><button
                   class="link-color swatch"
-                  style="background: #d9ff6a"
                   data-link-color="#d9ff6a"
                   aria-label="Lime link cards"
                 ></button
                 ><button
                   class="link-color swatch"
-                  style="background: #f7c64a"
                   data-link-color="#f7c64a"
                   aria-label="Gold link cards"
                 ></button>
@@ -376,7 +369,7 @@ Photographer, creative director, and collector of small beautiful things.</texta
           <div class="section-head">
             <span class="section-title">Appearance</span>
           </div>
-          <div class="control" style="margin-bottom: 22px">
+          <div class="control template-control">
             <label>Templates</label>
             <div class="template-grid" id="templateGrid">
               <button class="template active" data-template="classic">
@@ -410,31 +403,26 @@ Photographer, creative director, and collector of small beautiful things.</texta
               <div class="swatches">
                 <button
                   class="swatch active"
-                  style="background: #e6f1dc"
                   data-bg="#e6f1dc"
                   aria-label="Green background"
                 ></button
                 ><button
                   class="swatch"
-                  style="background: #f2dfd5"
                   data-bg="#f2dfd5"
                   aria-label="Peach background"
                 ></button
                 ><button
                   class="swatch"
-                  style="background: #dce9ff"
                   data-bg="#dce9ff"
                   aria-label="Blue background"
                 ></button
                 ><button
                   class="swatch"
-                  style="background: #e6e2f4"
                   data-bg="#e6e2f4"
                   aria-label="Lavender background"
                 ></button
                 ><button
                   class="swatch"
-                  style="background: #ffffff"
                   data-bg="#ffffff"
                   aria-label="White background"
                 ></button>
@@ -463,20 +451,10 @@ Photographer, creative director, and collector of small beautiful things.</texta
               ><input id="pageTitle" value="Tessa Lee - Photographer" />
             </div>
           </div>
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-top: 20px;
-            "
-          >
+          <div class="settings-toggle-row">
             <div>
-              <strong style="font-size: 13px">Public page</strong>
-              <div
-                style="color: var(--muted); font-size: 12px; margin-top: 3px"
-                id="urlPreview"
-              >
+              <strong class="settings-toggle-label">Public page</strong>
+              <div class="settings-toggle-preview" id="urlPreview">
                 bhio.link/tessalee
               </div>
             </div>

@@ -347,6 +347,7 @@ i[class*="fa-"],
   height: 30px;
   color: #a3afa5;
   cursor: grab;
+  -webkit-user-select: none;
   user-select: none;
   font-size: 13px;
   border-radius: 4px;
@@ -403,6 +404,7 @@ i[class*="fa-"],
   background: #fee2e2;
 }
 .toggle {
+  -webkit-appearance: none;
   appearance: none;
   width: 28px;
   height: 17px;
@@ -476,6 +478,37 @@ i[class*="fa-"],
 .swatch.active {
   outline: 1px solid var(--ink);
   outline-offset: 3px;
+}
+.link-color[data-link-color="#ffffff"] { background: #ffffff; }
+.link-color[data-link-color="#172219"] { background: #172219; }
+.link-color[data-link-color="#d9ff6a"] { background: #d9ff6a; }
+.link-color[data-link-color="#f7c64a"] { background: #f7c64a; }
+
+.swatch[data-bg="#e6f1dc"] { background: #e6f1dc; }
+.swatch[data-bg="#f2dfd5"] { background: #f2dfd5; }
+.swatch[data-bg="#dce9ff"] { background: #dce9ff; }
+.swatch[data-bg="#e6e2f4"] { background: #e6e2f4; }
+.swatch[data-bg="#ffffff"] { background: #ffffff; }
+
+.profile-extra-fields {
+  margin-top: 17px;
+}
+.template-control {
+  margin-bottom: 22px;
+}
+.settings-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.settings-toggle-label {
+  font-size: 13px;
+}
+.settings-toggle-preview {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
 }
 .range {
   width: 100%;
