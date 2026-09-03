@@ -233,7 +233,8 @@ i[class*="fa-"],
   font-size: 12px;
   font-weight: 600;
 }
-.editor h1 {
+.editor h1,
+.editor h2 {
   font-size: 30px;
   letter-spacing: -1.4px;
   margin: 0 0 8px;
@@ -1885,7 +1886,8 @@ html.is-public-profile .app {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
-.auth-panel h1 {
+.auth-panel h1,
+.auth-panel h2 {
   margin: 14px 0 9px;
   font-size: 38px;
   letter-spacing: -1.8px;
@@ -2137,7 +2139,8 @@ html.is-public-profile .app {
   .topline {
     margin-bottom: 31px;
   }
-  .editor h1 {
+  .editor h1,
+  .editor h2 {
     font-size: 26px;
   }
   .preview-area {
@@ -2399,7 +2402,8 @@ html.is-public-profile .app {
   .topline {
     margin-bottom: 31px;
   }
-  .editor h1 {
+  .editor h1,
+  .editor h2 {
     font-size: 26px;
   }
   .preview-area {
