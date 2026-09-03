@@ -1622,6 +1622,7 @@ function renderPublicProfile(profile) {
   content.className = `public-profile ${template === "classic" ? "" : "template-" + template}`;
   content.style.background = background;
   content.style.fontFamily = `'${font}', sans-serif`;
+  content.style.setProperty("--public-link-color", linkColor);
   const inner = document.createElement("div");
   inner.className = "public-profile-inner";
   if (pageSettings.profileImage) {
@@ -1774,9 +1775,6 @@ function renderPublicProfile(profile) {
     const ctaBtnUrl = page.ctaButtonUrl ? normalizeExternalUrl(page.ctaButtonUrl) || page.ctaButtonUrl : "";
     cta.innerHTML = `
       <div class="public-profile-cta-card">
-        <div class="public-profile-cta-top">
-          <span class="public-profile-cta-badge"><i class="fa-solid fa-paper-plane"></i> Let's Connect</span>
-        </div>
         ${page.ctaTitle ? `<h3 class="public-profile-cta-title">${escapeHtml(page.ctaTitle)}</h3>` : ""}
         ${page.ctaDesc ? `<p class="public-profile-cta-desc">${escapeHtml(page.ctaDesc)}</p>` : ""}
         ${ctaBtnUrl ? `<a class="public-profile-cta-btn" href="${ctaBtnUrl}" target="_blank" rel="noopener noreferrer"><span>${escapeHtml(page.ctaButtonText || "Send a message")}</span><i class="fa-solid fa-arrow-right"></i></a>` : ""}
