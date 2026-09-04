@@ -626,7 +626,12 @@ function syncAll() {
     `phone-page ${state.template === "classic" ? "" : "template-" + state.template}`;
   $("#phonePage").style.fontFamily = `'${state.font || "DM Sans"}', sans-serif`;
   $("#phonePage").dataset.align = state.linkStyle.align || "center";
-  $("#phonePage").style.background = state.background || "#e6f1dc";
+  const currentBg = state.background || "#e6f1dc";
+  $("#phonePage").style.background = currentBg;
+  const deviceEl = $(".device");
+  if (deviceEl) deviceEl.style.background = currentBg;
+  const previewAreaEl = $("#previewArea");
+  if (previewAreaEl) previewAreaEl.style.setProperty("--current-bg", currentBg);
   $("#radius").value = state.radius || 8;
   document
     .querySelectorAll(".swatch[data-bg]")
@@ -1173,6 +1178,10 @@ document.querySelectorAll(".swatch").forEach((swatch) =>
     swatch.classList.add("active");
     state.background = swatch.dataset.bg;
     $("#phonePage").style.background = state.background;
+    const deviceEl = $(".device");
+    if (deviceEl) deviceEl.style.background = state.background;
+    const previewAreaEl = $("#previewArea");
+    if (previewAreaEl) previewAreaEl.style.setProperty("--current-bg", state.background);
     queueSave();
   }),
 );
@@ -1526,7 +1535,14 @@ document.querySelectorAll("[data-view]").forEach((button) =>
     button.classList.add("active");
     const isPreview = button.dataset.view === "preview";
     $("#previewArea").classList.toggle("show", isPreview);
-    if (isPreview) updatePreviewZoom();
+    if (isPreview) {
+      updatePreviewZoom();
+      const currentBg = state.background || "#e6f1dc";
+      const deviceEl = $(".device");
+      if (deviceEl) deviceEl.style.background = currentBg;
+      const previewAreaEl = $("#previewArea");
+      if (previewAreaEl) previewAreaEl.style.setProperty("--current-bg", currentBg);
+    }
   }),
 );
 function openShare() {
@@ -1737,6 +1753,8 @@ function renderPublicProfile(profile) {
   const content = document.createElement("main");
   content.className = `public-profile ${template === "classic" ? "" : "template-" + template}`;
   content.style.background = background;
+  document.documentElement.style.background = background;
+  document.body.style.background = background;
   content.style.fontFamily = `'${font}', sans-serif`;
   content.style.setProperty("--public-link-color", linkColor);
   const inner = document.createElement("div");
