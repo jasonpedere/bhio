@@ -362,16 +362,22 @@ function renderPageSwitcher() {
     `<button class="add-page" type="button" id="addPage" ${pages.length >= MAX_PAGES ? "disabled" : ""} aria-label="Add page">+ Add page</button>`;
   $("#addPage").addEventListener("click", addPage);
 }
+let currentSessionUserId = null;
 const LOCAL_DRAFT_KEY = "bhio-draft";
 function setSaveStatus(text) {
   $("#saveStatus").textContent = text;
 }
+function getDraftKey(userId) {
+  return userId ? `bhio-draft-${userId}` : "bhio-draft-guest";
+}
 function saveDraftLocally() {
   try {
     saveCurrentPage();
+    if (!currentSessionUserId) return;
+    const key = getDraftKey(currentSessionUserId);
     localStorage.setItem(
-      LOCAL_DRAFT_KEY,
-      JSON.stringify({ pages, currentPageIndex }),
+      key,
+      JSON.stringify({ pages, currentPageIndex, timestamp: Date.now() }),
     );
     setSaveStatus("Saved locally");
   } catch (error) {
@@ -379,11 +385,11 @@ function saveDraftLocally() {
     setSaveStatus("Local save unavailable");
   }
 }
-function restoreDraft() {
+function restoreDraft(userId) {
   try {
-    const rawDraft =
-      localStorage.getItem(LOCAL_DRAFT_KEY) ||
-      localStorage.getItem("solebio-draft");
+    if (!userId) return false;
+    const key = getDraftKey(userId);
+    const rawDraft = localStorage.getItem(key);
     const draft = JSON.parse(rawDraft || "null");
     if (!draft || !Array.isArray(draft.pages) || !draft.pages.length)
       return false;
@@ -398,6 +404,108 @@ function restoreDraft() {
     console.error("Could not restore local draft:", error);
     return false;
   }
+}
+function clearAllLocalDrafts() {
+  try {
+    localStorage.removeItem(LOCAL_DRAFT_KEY);
+    localStorage.removeItem("solebio-draft");
+    localStorage.removeItem("bhio-draft-guest");
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith("bhio-draft") || k.startsWith("solebio-draft"))) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch (e) {
+    console.error("Error clearing drafts:", e);
+  }
+}
+function resetEditorToCleanDefault(templateName = DEFAULT_TEMPLATE) {
+  clearTimeout(saveTimer);
+  currentSessionUserId = null;
+  pages = [];
+  currentPageIndex = 0;
+
+  // Clear in-memory state
+  Object.keys(state).forEach((key) => delete state[key]);
+  const preset = TEMPLATE_PRESETS[templateName] || TEMPLATE_PRESETS[DEFAULT_TEMPLATE];
+  Object.assign(state, {
+    template: preset.template,
+    profileShape: preset.profileShape || "circle",
+    font: preset.font || "DM Sans",
+    background: preset.background || "#e6f1dc",
+    radius: Number.isFinite(preset.radius) ? preset.radius : 8,
+    profileImage: "",
+    linkStyle: {
+      color: "#ffffff",
+      align: "center",
+      iconPosition: "left",
+      iconTreatment: "plain",
+      ...(preset.linkStyle || {}),
+    },
+    links: [],
+    socials: [],
+  });
+
+  const inputIds = [
+    "displayName",
+    "username",
+    "headline",
+    "occupation",
+    "tagline",
+    "bio",
+    "aboutMe",
+    "interests",
+    "location",
+    "pageTitle",
+    "ctaDesc",
+    "ctaButtonUrl",
+  ];
+  inputIds.forEach((id) => {
+    const el = $(`#${id}`);
+    if (el) el.value = "";
+  });
+
+  if ($("#avatarShape")) $("#avatarShape").value = "circle";
+  if ($("#ctaTitle")) $("#ctaTitle").value = "Let's Connect";
+  if ($("#ctaButtonText")) $("#ctaButtonText").value = "Send a message";
+  if ($("#ctaEnabled")) $("#ctaEnabled").checked = true;
+  if ($("#visibility")) $("#visibility").checked = true;
+
+  if ($("#editorAvatar")) {
+    $("#editorAvatar").style.backgroundImage = "";
+    $("#editorAvatar").dataset.shape = "circle";
+  }
+  if ($(".phone-avatar")) {
+    $(".phone-avatar").style.backgroundImage = "";
+    $(".phone-avatar").dataset.shape = "circle";
+  }
+  if ($("#previewUrl")) $("#previewUrl").textContent = "bhio.link";
+  if ($("#urlPreview")) $("#urlPreview").textContent = "bhio.link";
+
+  pages = [
+    {
+      name: "Page 1",
+      displayName: "",
+      username: "",
+      headline: "",
+      occupation: "",
+      tagline: "",
+      bio: "",
+      aboutMe: "",
+      interests: "",
+      location: "",
+      pageTitle: "",
+      visibility: true,
+      ctaEnabled: true,
+      ctaTitle: "Let's Connect",
+      ctaDesc: "",
+      ctaButtonText: "Send a message",
+      ctaButtonUrl: "",
+      settings: JSON.parse(JSON.stringify(state)),
+    },
+  ];
+  applyPage(pages[0]);
 }
 function addPage() {
   if (pages.length >= MAX_PAGES) return;
@@ -429,15 +537,119 @@ function addPage() {
   applyPage(pages[currentPageIndex]);
   queueSave();
 }
+
+const TEMPLATE_PRESETS = {
+  modern: {
+    template: "modern",
+    background: "#dfe9ff",
+    font: "Space Grotesk",
+    radius: 16,
+    profileShape: "rounded",
+    linkStyle: {
+      color: "#172219",
+      align: "center",
+      iconPosition: "left",
+      iconTreatment: "plain",
+    },
+  },
+  minimal: {
+    template: "minimal",
+    background: "#ffffff",
+    font: "DM Sans",
+    radius: 0,
+    profileShape: "circle",
+    linkStyle: {
+      color: "#ffffff",
+      align: "center",
+      iconPosition: "left",
+      iconTreatment: "plain",
+    },
+  },
+  retro: {
+    template: "retro",
+    background: "#f4bd43",
+    font: "Playfair Display",
+    radius: 0,
+    profileShape: "circle",
+    linkStyle: {
+      color: "#172c53",
+      align: "center",
+      iconPosition: "left",
+      iconTreatment: "plain",
+    },
+  },
+  bold: {
+    template: "bold",
+    background: "#ee725b",
+    font: "Space Grotesk",
+    radius: 0,
+    profileShape: "square",
+    linkStyle: {
+      color: "#d9ff6a",
+      align: "center",
+      iconPosition: "left",
+      iconTreatment: "plain",
+    },
+  },
+  classic: {
+    template: "classic",
+    background: "#e6f1dc",
+    font: "DM Sans",
+    radius: 8,
+    profileShape: "circle",
+    linkStyle: {
+      color: "#ffffff",
+      align: "center",
+      iconPosition: "left",
+      iconTreatment: "plain",
+    },
+  },
+};
+
+function applyTemplatePreset(templateName) {
+  console.log('[applyTemplatePreset] Applying:', templateName);
+  const preset = TEMPLATE_PRESETS[templateName];
+  if (!preset) return;
+  state.template = preset.template;
+  state.background = preset.background;
+  state.font = preset.font;
+  state.radius = preset.radius;
+  state.profileShape = preset.profileShape || "circle";
+  if (preset.linkStyle) {
+    state.linkStyle = { ...(state.linkStyle || {}), ...preset.linkStyle };
+  }
+  const avatarShapeEl = $("#avatarShape");
+  if (avatarShapeEl) avatarShapeEl.value = state.profileShape;
+  if (typeof syncAll === "function") {
+    syncAll();
+  } else {
+    renderPreviewDetails();
+  }
+}
+
 function openEditor() {
   document.documentElement.classList.add("has-session");
   $("#landing").hidden = true;
   $("#authScreen").classList.remove("open");
   $(".app").classList.add("editor-open");
+
+  const pending = sessionStorage.getItem("bhio_pending_template");
+  console.log('[openEditor] Found pending template:', pending);
+  if (pending && TEMPLATE_PRESETS[pending]) {
+    applyTemplatePreset(pending);
+    sessionStorage.removeItem("bhio_pending_template");
+    saveCurrentPage();
+    queueSave();
+  }
+
   requestAnimationFrame(updatePreviewZoom);
 }
+window.openEditor = openEditor;
+window.applyTemplatePreset = applyTemplatePreset;
 function openLanding() {
   clearTimeout(saveTimer);
+  clearAllLocalDrafts();
+  resetEditorToCleanDefault();
   document.documentElement.classList.remove("has-session");
   $(".app").classList.remove("editor-open");
   $("#previewArea").classList.remove("show");
@@ -466,14 +678,316 @@ function openAuth(mode) {
 }
 $("#landingStart").addEventListener("click", () => openAuth("signup"));
 $("#landingOpen").addEventListener("click", () => openAuth("login"));
-$("#landingUsernameStart").addEventListener("click", () => {
-  const username = $("#landingUsername").value.trim().replace(/^@/, "");
-  if (username) {
-    $("#username").value = `@${username}`;
-    $("#username").dispatchEvent(new Event("input"));
+
+let landingUsernameCheckTimer;
+async function checkLandingUsernameAvailability(rawVal) {
+  const clean = (rawVal || "").trim().replace(/^@/, "").toLowerCase();
+  const statusEl = $("#landingUsernameStatus");
+  const ctaEl = $(".username-cta");
+  if (!statusEl) return;
+
+  if (!clean) {
+    statusEl.className = "landing-username-status";
+    statusEl.innerHTML = "";
+    if (ctaEl) ctaEl.classList.remove("is-available", "is-taken", "is-invalid", "is-checking");
+    return;
   }
+
+  if (clean.length < 3) {
+    statusEl.className = "landing-username-status invalid show";
+    statusEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Must be at least 3 characters';
+    if (ctaEl) {
+      ctaEl.classList.remove("is-available", "is-taken", "is-checking");
+      ctaEl.classList.add("is-invalid");
+    }
+    return;
+  }
+
+  if (!/^[a-z0-9_]{3,30}$/.test(clean)) {
+    statusEl.className = "landing-username-status invalid show";
+    statusEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Only letters, numbers, and underscores';
+    if (ctaEl) {
+      ctaEl.classList.remove("is-available", "is-taken", "is-checking");
+      ctaEl.classList.add("is-invalid");
+    }
+    return;
+  }
+
+  statusEl.className = "landing-username-status checking show";
+  statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Checking availability...';
+  if (ctaEl) {
+    ctaEl.classList.remove("is-available", "is-taken", "is-invalid");
+    ctaEl.classList.add("is-checking");
+  }
+
+  if (!supabaseClient) {
+    statusEl.className = "landing-username-status available show";
+    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> bhio.link/${clean} is available`;
+    if (ctaEl) {
+      ctaEl.classList.remove("is-taken", "is-invalid", "is-checking");
+      ctaEl.classList.add("is-available");
+    }
+    return;
+  }
+
+  try {
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+    const currentUserId = user?.id;
+
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("id, username")
+      .eq("username", clean);
+
+    const currentInput = ($("#landingUsername")?.value || "")
+      .trim()
+      .replace(/^@/, "")
+      .toLowerCase();
+    if (currentInput !== clean) return;
+
+    if (error) {
+      console.warn("Could not verify landing username:", error);
+      statusEl.className = "landing-username-status";
+      statusEl.innerHTML = "";
+      if (ctaEl) ctaEl.classList.remove("is-available", "is-taken", "is-invalid", "is-checking");
+      return;
+    }
+
+    const isOwnedByMe =
+      data && data.length > 0 && currentUserId && data[0].id === currentUserId;
+    const isAvailable = !data || data.length === 0 || isOwnedByMe;
+
+    if (isAvailable) {
+      statusEl.className = "landing-username-status available show";
+      statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> bhio.link/${clean} is available`;
+      if (ctaEl) {
+        ctaEl.classList.remove("is-taken", "is-invalid", "is-checking");
+        ctaEl.classList.add("is-available");
+      }
+    } else {
+      statusEl.className = "landing-username-status taken show";
+      statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> bhio.link/${clean} is already taken`;
+      if (ctaEl) {
+        ctaEl.classList.remove("is-available", "is-invalid", "is-checking");
+        ctaEl.classList.add("is-taken");
+      }
+    }
+  } catch (err) {
+    console.error("Landing username check error:", err);
+  }
+}
+window.checkLandingUsernameAvailability = checkLandingUsernameAvailability;
+
+const landingUsernameInput = $("#landingUsername");
+if (landingUsernameInput) {
+  landingUsernameInput.addEventListener("input", () => {
+    clearTimeout(landingUsernameCheckTimer);
+    landingUsernameCheckTimer = setTimeout(() => {
+      checkLandingUsernameAvailability(landingUsernameInput.value);
+    }, 280);
+  });
+  landingUsernameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      $("#landingUsernameStart")?.click();
+    }
+  });
+}
+
+$("#landingUsernameStart").addEventListener("click", () => {
+  const input = $("#landingUsername");
+  const username = input.value.trim().replace(/^@/, "");
+  if (!username) {
+    input.focus();
+    return;
+  }
+  const statusEl = $("#landingUsernameStatus");
+  if (statusEl && (statusEl.classList.contains("taken") || statusEl.classList.contains("invalid"))) {
+    const ctaEl = $(".username-cta");
+    if (ctaEl) {
+      ctaEl.classList.add("shake-error");
+      setTimeout(() => ctaEl.classList.remove("shake-error"), 400);
+    }
+    input.focus();
+    return;
+  }
+  $("#username").value = `@${username}`;
+  $("#username").dispatchEvent(new Event("input"));
   openAuth("signup");
 });
+
+// Landing page templates showcase interactions
+const showcaseTabs = $("#showcaseTabs");
+const showcaseCards = document.querySelectorAll(".showcase-card");
+
+if (showcaseTabs) {
+  showcaseTabs.addEventListener("click", (e) => {
+    const tab = e.target.closest(".showcase-tab");
+    if (!tab) return;
+    showcaseTabs.querySelectorAll(".showcase-tab").forEach((btn) => btn.classList.remove("active"));
+    tab.classList.add("active");
+
+    const filter = tab.dataset.filter;
+    showcaseCards.forEach((card) => {
+      if (filter === "all") {
+        card.classList.remove("dimmed", "highlighted");
+      } else if (card.dataset.template === filter) {
+        card.classList.remove("dimmed");
+        card.classList.add("highlighted");
+        card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      } else {
+        card.classList.add("dimmed");
+        card.classList.remove("highlighted");
+      }
+    });
+  });
+}
+
+document.querySelectorAll(".showcase-select-btn").forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const templateName = btn.dataset.template;
+    if (templateName && TEMPLATE_PRESETS[templateName]) {
+      try {
+        sessionStorage.setItem("bhio_pending_template", templateName);
+      } catch (err) {
+        console.error("Could not save pending template:", err);
+      }
+      applyTemplatePreset(templateName);
+    }
+    if (document.documentElement.classList.contains("has-session")) {
+      openEditor();
+      return;
+    }
+    const input = $("#landingUsername");
+    if (input) {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => input.focus(), 400);
+    }
+  });
+});
+
+const showcaseClaimBtn = $("#showcaseClaimBtn");
+if (showcaseClaimBtn) {
+  showcaseClaimBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const input = $("#landingUsername");
+    if (input) {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => input.focus(), 400);
+    }
+  });
+}
+
+const footerClaimBtn = $(".footer-claim");
+if (footerClaimBtn) {
+  footerClaimBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const input = $("#landingUsername");
+    if (input) {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => input.focus(), 400);
+    }
+  });
+}
+
+// ==========================================================================
+// LANDING HERO 3D PARALLAX & TILT INTERACTION
+// ==========================================================================
+function initLandingHero3DParallax() {
+  const heroArt = $("#heroArt");
+  const heroTilt = $("#heroMockupTilt");
+  const heroGlare = $("#heroScreenGlare");
+  if (!heroArt || !heroTilt) return;
+
+  // Respect users who prefer reduced motion
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  let bounds = null;
+  let targetPitch = 0; // rotateX
+  let targetYaw = 0;   // rotateY
+  let currentPitch = 0;
+  let currentYaw = 0;
+  let isHovered = false;
+  let rafId = null;
+
+  function updateBounds() {
+    bounds = heroArt.getBoundingClientRect();
+  }
+
+  function render() {
+    const lerp = 0.085;
+    currentPitch += (targetPitch - currentPitch) * lerp;
+    currentYaw += (targetYaw - currentYaw) * lerp;
+
+    const pitchStr = currentPitch.toFixed(2);
+    const yawStr = currentYaw.toFixed(2);
+
+    heroTilt.style.transform = `perspective(1000px) rotateX(${pitchStr}deg) rotateY(${yawStr}deg) scale3d(1.025, 1.025, 1.025)`;
+
+    if (heroGlare) {
+      // Modulate glare reflection based on tilt angle
+      const glareFactor = 0.55 + (currentYaw / 16) * 0.35 - (currentPitch / 14) * 0.2;
+      const clampedGlare = Math.max(0.15, Math.min(0.9, glareFactor));
+      heroGlare.style.opacity = clampedGlare.toFixed(2);
+    }
+
+    const diff = Math.abs(targetPitch - currentPitch) + Math.abs(targetYaw - currentYaw);
+    if (isHovered || diff > 0.02) {
+      rafId = requestAnimationFrame(render);
+    } else {
+      currentPitch = 0;
+      currentYaw = 0;
+      heroTilt.style.transform = "";
+      if (heroGlare) heroGlare.style.opacity = "";
+      rafId = null;
+    }
+  }
+
+  function ensureLoop() {
+    if (!rafId) {
+      rafId = requestAnimationFrame(render);
+    }
+  }
+
+  heroArt.addEventListener("mouseenter", () => {
+    isHovered = true;
+    updateBounds();
+    ensureLoop();
+  });
+
+  heroArt.addEventListener("mousemove", (e) => {
+    if (!bounds) updateBounds();
+    const nx = (e.clientX - bounds.left) / bounds.width - 0.5;  // -0.5 to 0.5
+    const ny = (e.clientY - bounds.top) / bounds.height - 0.5;  // -0.5 to 0.5
+
+    const maxPitch = 11; // Up/down tilt
+    const maxYaw = 14;   // Left/right tilt
+
+    targetPitch = -ny * maxPitch;
+    targetYaw = nx * maxYaw;
+
+    ensureLoop();
+  });
+
+  heroArt.addEventListener("mouseleave", () => {
+    isHovered = false;
+    targetPitch = 0;
+    targetYaw = 0;
+    ensureLoop();
+  });
+
+  window.addEventListener("resize", () => {
+    if (isHovered) updateBounds();
+  }, { passive: true });
+}
+
+initLandingHero3DParallax();
+
 $("#authBack").addEventListener("click", () => {
   $("#authScreen").classList.remove("open");
   $("#landing").hidden = false;
@@ -499,6 +1013,9 @@ $("#logoutButton").addEventListener("click", async () => {
   if (!supabaseClient) return;
   const button = $("#logoutButton");
   button.disabled = true;
+  clearTimeout(saveTimer);
+  clearAllLocalDrafts();
+  resetEditorToCleanDefault();
   const { error } = await supabaseClient.auth.signOut({ scope: "local" });
   button.disabled = false;
   if (error) {
@@ -540,11 +1057,14 @@ $("#deleteConfirm").addEventListener("click", async () => {
     return;
   }
   await supabaseClient.auth.signOut({ scope: "local" });
+  clearAllLocalDrafts();
+  resetEditorToCleanDefault();
   closeDeleteModal();
   openLanding();
   alert("Your account has been deleted.");
 });
 async function loadProfile(user) {
+  currentSessionUserId = user.id;
   const { data, error } = await supabaseClient
     .from("profiles")
     .select("*")
@@ -552,18 +1072,33 @@ async function loadProfile(user) {
     .maybeSingle();
   if (error) throw error;
   if (!data) return;
+
+  const rawUsername = (data.username || user.user_metadata?.username || "").toLowerCase();
+  const isJasonAccount = rawUsername === "jasonpedere" || rawUsername === "jason";
+
   const hasSavedPages =
     data.settings &&
     Array.isArray(data.settings.pages) &&
     data.settings.pages.length > 0;
   const firstPage = hasSavedPages ? data.settings.pages[0] : null;
+
+  // Detect and sanitize accidental cross-account leak (e.g. johntest got Jason's data during previous testing)
+  const isLeakedData =
+    !isJasonAccount &&
+    firstPage &&
+    (firstPage.displayName === "Jason Pedere" ||
+      firstPage.headline?.includes("JDS Delivery") ||
+      firstPage.bio?.includes("JDS Delivery") ||
+      firstPage.settings?.links?.some((l) => l.title?.includes("JDS Delivery")));
+
   const isCompletelyBlank =
     hasSavedPages &&
     !(data.display_name || firstPage?.displayName) &&
     !(data.bio || firstPage?.bio) &&
     !(data.location || firstPage?.location) &&
     (!firstPage?.settings?.links || firstPage.settings.links.length === 0);
-  if (hasSavedPages && !isCompletelyBlank) {
+
+  if (hasSavedPages && !isCompletelyBlank && !isLeakedData) {
     pages = data.settings.pages.slice(0, MAX_PAGES);
     if (pages[0]) {
       if (data.headline && !pages[0].headline) pages[0].headline = data.headline;
@@ -577,34 +1112,65 @@ async function loadProfile(user) {
       if (data.cta_button_url && !pages[0].ctaButtonUrl) pages[0].ctaButtonUrl = data.cta_button_url;
     }
   } else {
-    const draftRestored = restoreDraft();
+    const draftRestored = !isLeakedData && restoreDraft(user.id);
     if (!draftRestored) {
+      const pendingTemplate = sessionStorage.getItem("bhio_pending_template") || DEFAULT_TEMPLATE;
+      const preset = TEMPLATE_PRESETS[pendingTemplate] || TEMPLATE_PRESETS[DEFAULT_TEMPLATE];
+      const initialSettings = {
+        template: preset.template,
+        profileShape: preset.profileShape || "circle",
+        font: preset.font || "DM Sans",
+        background: preset.background || "#e6f1dc",
+        radius: Number.isFinite(preset.radius) ? preset.radius : 8,
+        profileImage: isLeakedData ? "" : data.settings?.profileImage || "",
+        linkStyle: {
+          color: "#ffffff",
+          align: "center",
+          iconPosition: "left",
+          iconTreatment: "plain",
+          ...(preset.linkStyle || {}),
+        },
+        links: [],
+        socials: [],
+      };
+
+      const initialUsername = data.username
+        ? `@${data.username}`
+        : user.user_metadata?.username
+          ? `@${user.user_metadata.username}`
+          : "";
+      const initialDisplayName =
+        (isLeakedData ? "" : data.display_name) ||
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        "";
+
       pages = [
         {
           name: "Page 1",
-          displayName: data.display_name || "Jason Pedere",
-          username: data.username
-            ? `@${data.username}`
-            : user.user_metadata?.username
-              ? `@${user.user_metadata.username}`
-              : "@jason",
-          headline: data.headline || "",
-          occupation: data.occupation || "",
-          tagline: data.tagline || "",
-          bio: data.bio || "",
-          aboutMe: data.about_me || "",
-          interests: data.interests || "",
-          location: data.location || "",
+          displayName: initialDisplayName,
+          username: initialUsername,
+          headline: isLeakedData ? "" : data.headline || "",
+          occupation: isLeakedData ? "" : data.occupation || "",
+          tagline: isLeakedData ? "" : data.tagline || "",
+          bio: isLeakedData ? "" : data.bio || "",
+          aboutMe: isLeakedData ? "" : data.about_me || "",
+          interests: isLeakedData ? "" : data.interests || "",
+          location: isLeakedData ? "" : data.location || "",
           pageTitle: data.page_title || "",
           visibility: data.visibility !== false,
           ctaEnabled: data.cta_enabled !== false,
-          ctaTitle: data.cta_title || "Let's Connect",
-          ctaDesc: data.cta_desc || "",
-          ctaButtonText: data.cta_button_text || "Send a message",
-          ctaButtonUrl: data.cta_button_url || "",
-          settings: JSON.parse(JSON.stringify(state)),
+          ctaTitle: "Let's Connect",
+          ctaDesc: "",
+          ctaButtonText: "Send a message",
+          ctaButtonUrl: "",
+          settings: initialSettings,
         },
       ];
+
+      if (isLeakedData) {
+        queueSave();
+      }
     }
   }
   currentPageIndex = 0;
@@ -2005,7 +2571,7 @@ else {
     openEditor();
   }
   ensureLinkAnalytics();
-  if (!restoreDraft()) pages = [{ name: "Page 1", ...capturePage() }];
+  resetEditorToCleanDefault();
   renderPageSwitcher();
   renderLinks();
   renderSocials();
@@ -2017,6 +2583,9 @@ else {
   });
   renderAnalytics();
   checkUsernameAvailability($("#username").value);
+  if ($("#landingUsername")?.value) {
+    checkLandingUsernameAvailability($("#landingUsername").value);
+  }
   restoreSession();
   updatePreviewZoom();
 }

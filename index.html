@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bhio | Beautiful link-in-bio pages</title>
-    <meta name="theme-color" content="#005bf6" />
+    <meta name="theme-color" content="#254b38" />
     <meta
       name="description"
       content="Create a beautiful link-in-bio page with Bhio. Share your work, social profiles, and everything you make from one memorable link."
@@ -41,18 +41,122 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "Bhio",
-        "url": "https://bhio.link/",
-        "image": "https://bhio.link/icons/og-image.png",
-        "description": "Create a beautiful link-in-bio page for everything you share.",
-        "applicationCategory": "DesignApplication",
-        "operatingSystem": "Web",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://bhio.link/#website",
+            "url": "https://bhio.link/",
+            "name": "Bhio",
+            "alternateName": ["Bhio Link", "Bhio Link in Bio"],
+            "description": "Create a beautiful, free link-in-bio page with Bhio. Share your work, social profiles, and everything you make from one memorable link.",
+            "inLanguage": "en-US",
+            "publisher": {
+              "@id": "https://bhio.link/#organization"
+            }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://bhio.link/#organization",
+            "name": "Bhio",
+            "url": "https://bhio.link/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://bhio.link/icons/icon-512.svg",
+              "width": "512",
+              "height": "512"
+            },
+            "image": "https://bhio.link/icons/og-image.png"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://bhio.link/#app",
+            "name": "Bhio",
+            "url": "https://bhio.link/",
+            "image": "https://bhio.link/icons/og-image.png",
+            "description": "Create a beautiful link-in-bio page for everything you share. Unlimited links, curated aesthetics, and real-time preview.",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            }
+          },
+          {
+            "@type": "ItemList",
+            "@id": "https://bhio.link/#sitelinks",
+            "name": "Bhio Navigation",
+            "description": "Explore Bhio's main sections and features",
+            "itemListElement": [
+              {
+                "@type": "SiteNavigationElement",
+                "position": 1,
+                "name": "Templates",
+                "description": "Explore 5 curated aesthetic layouts: Modern, Minimal, Retro, Bold, and Classic.",
+                "url": "https://bhio.link/#templates"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 2,
+                "name": "Features",
+                "description": "Enjoy unlimited links, real-time live phone preview, custom branding, and zero fees.",
+                "url": "https://bhio.link/#features"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 3,
+                "name": "FAQ",
+                "description": "Frequently asked questions about Bhio, free features, and getting started.",
+                "url": "https://bhio.link/#faq"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 4,
+                "name": "Create Free Page",
+                "description": "Claim your custom username and create your link-in-bio page in seconds.",
+                "url": "https://bhio.link/#landing"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://bhio.link/#faqpage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is Bhio really 100% free?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, absolutely! Claiming your handle, using all 5 curated templates, and adding unlimited links is completely free. There are no trial periods and no credit card required."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How many links can I add?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Right now, you get unlimited links and social icons. Add your Instagram, TikTok, YouTube, Spotify, WhatsApp, portfolio, shop links, and more with zero restrictions."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What happens when you add paid templates later?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "All core features, existing templates, and created links will always remain free for our creators. Any future paid offerings will be purely optional premium designer templates for creators who want extra bespoke styles."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How long does it take to set up?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Less than a minute! Pick your custom username, add your links, pick your favorite aesthetic, and your page is immediately live at bhio.link/yourname."
+                }
+              }
+            ]
+          }
+        ]
       }
     </script>
     <!-- Clarity tracking code for https://bhio.link/ -->
@@ -118,50 +222,313 @@
   </head>
   <body>
     <section class="landing" id="landing">
-      <nav class="landing-nav">
+      <nav class="landing-nav" aria-label="Main navigation">
         <div class="landing-brand">
           <img src="./icons/icon.svg" alt="" />bhio
         </div>
         <div class="landing-links-nav">
-          <a href="#features">Features</a><a href="#faq">FAQ</a>
+          <a href="#templates" title="Bhio Templates">Templates</a>
+          <a href="#features" title="Bhio Features">Features</a>
+          <a href="#faq" title="Bhio FAQ">FAQ</a>
         </div>
         <div class="landing-actions">
           <button class="landing-login" id="landingOpen">Log in</button
-          ><button class="landing-signup" id="landingStart">Create</button>
+          ><button class="landing-signup" id="landingStart">Start Free</button>
         </div>
       </nav>
       <div class="landing-hero">
         <div class="landing-copy">
-          <span class="landing-kicker">Your link in bio</span>
+          <span class="landing-kicker"><i class="fa-solid fa-sparkles"></i> 100% Free Public Launch</span>
           <h1>One link.<br />All your world.</h1>
           <p>
-            Share what matters with one beautiful, personal page. Built to be
-            edited in moments and remembered longer.
+            Share what matters with one beautiful, personal page. Enjoy unlimited
+            links, curated aesthetics, and zero fees.
           </p>
+          <div id="landingUsernameStatus" class="landing-username-status" aria-live="polite"></div>
           <div class="username-cta">
             <span>bhio.link/</span
             ><input
               id="landingUsername"
               placeholder="yourname"
               aria-label="Choose your username"
+              autocomplete="off"
+              spellcheck="false"
             /><button id="landingUsernameStart">Create page</button>
           </div>
+          <div class="landing-trust-badges">
+            <span class="trust-badge"><i class="fa-solid fa-check"></i> 100% Free to use</span>
+            <span class="trust-badge"><i class="fa-solid fa-check"></i> Unlimited links</span>
+            <span class="trust-badge"><i class="fa-solid fa-check"></i> No credit card required</span>
+          </div>
         </div>
-        <div class="landing-art">
-          <div class="landing-social-orbit">
-            <i class="fa-brands fa-instagram"></i
-            ><i class="fa-brands fa-tiktok"></i
-            ><i class="fa-brands fa-youtube"></i>
+        <div class="landing-art" id="heroArt">
+          <!-- Ambient breathing halo glow behind mockup -->
+          <div class="landing-hero-glow" aria-hidden="true"></div>
+
+          <!-- Outer mockup container with ambient float -->
+          <div class="landing-hero-mockup-wrap" id="heroMockupWrap">
+            <!-- Inner tilt container for interactive 3D mouse parallax -->
+            <div class="landing-hero-mockup-tilt" id="heroMockupTilt">
+              <!-- Glass specular glare overlay -->
+              <div class="hero-screen-glare" id="heroScreenGlare" aria-hidden="true"></div>
+
+              <img
+                src="/samples/sample-classic-lifestyle.png"
+                alt="Bhio Classic Template - Tessa Lee"
+                class="landing-hero-mockup"
+                width="310"
+                height="640"
+                loading="eager"
+              />
+
+              <!-- Staggered Floating Social Orbit Badges (True 3D Depth) -->
+              <div class="hero-orbit-badge orbit-ig" title="Instagram" aria-hidden="true">
+                <i class="fa-brands fa-instagram"></i>
+              </div>
+              <div class="hero-orbit-badge orbit-tt" title="TikTok" aria-hidden="true">
+                <i class="fa-brands fa-tiktok"></i>
+              </div>
+              <div class="hero-orbit-badge orbit-yt" title="YouTube" aria-hidden="true">
+                <i class="fa-brands fa-youtube"></i>
+              </div>
+
+              <!-- Floating Social-Proof / Creator Pills -->
+              <div class="hero-floating-pill pill-live" aria-hidden="true">
+                <span class="pill-live-dot"></span>
+                <span class="pill-text">Live Profile</span>
+              </div>
+              <div class="hero-floating-pill pill-stat" aria-hidden="true">
+                <span class="pill-sparkle">✦</span>
+                <span class="pill-text"><strong>14.8k</strong> views this week</span>
+              </div>
+            </div>
           </div>
-          <div class="landing-phone">
-            <div class="landing-avatar"></div>
-            <div class="landing-name">Tessa Lee</div>
-            <div class="landing-handle">@tessalee</div>
-            <div class="landing-links"><i></i><i></i><i></i></div>
-          </div>
+
           <span class="landing-caption">Made for your everyday</span>
         </div>
       </div>
+
+      <!-- TEMPLATES SHOWCASE SECTION -->
+      <section class="landing-showcase" id="templates">
+        <div class="showcase-header">
+          <span class="showcase-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Curated Aesthetics</span>
+          <h2>Pick your vibe. Make it yours.</h2>
+          <p>
+            Whether you're a creator, developer, musician, or brand, choose from distinct layouts
+            crafted to showcase who you are in seconds.
+          </p>
+
+          <div class="showcase-tabs" id="showcaseTabs" role="tablist">
+            <button class="showcase-tab active" data-filter="all" type="button">All Styles</button>
+            <button class="showcase-tab" data-filter="modern" type="button">Modern</button>
+            <button class="showcase-tab" data-filter="minimal" type="button">Minimal</button>
+            <button class="showcase-tab" data-filter="retro" type="button">Retro</button>
+            <button class="showcase-tab" data-filter="bold" type="button">Bold</button>
+            <button class="showcase-tab" data-filter="classic" type="button">Classic</button>
+          </div>
+        </div>
+
+        <div class="showcase-carousel-wrapper">
+          <div class="showcase-track" id="showcaseTrack">
+            <!-- Modern -->
+            <div class="showcase-card" data-template="modern">
+              <div class="showcase-card-glow glow-modern"></div>
+              <div class="showcase-phone-wrap">
+                <img src="/samples/sample-modern-creator.png" alt="Modern Template - Maya Santos" loading="lazy" />
+                <span class="floating-tag tag-top">⚡ Sleek & Contemporary</span>
+              </div>
+              <div class="showcase-card-info">
+                <div class="showcase-card-top">
+                  <span class="showcase-pill pill-modern">Modern</span>
+                  <span class="showcase-persona">Maya Santos • Creator</span>
+                </div>
+                <button class="showcase-select-btn" data-template="modern" type="button">
+                  Use this template <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Minimal -->
+            <div class="showcase-card" data-template="minimal">
+              <div class="showcase-card-glow glow-minimal"></div>
+              <div class="showcase-phone-wrap">
+                <img src="/samples/sample-minimal-tech.png" alt="Minimal Template - Alex Rivera" loading="lazy" />
+                <span class="floating-tag tag-top">✦ Clean Monochrome</span>
+              </div>
+              <div class="showcase-card-info">
+                <div class="showcase-card-top">
+                  <span class="showcase-pill pill-minimal">Minimal</span>
+                  <span class="showcase-persona">Alex Rivera • Designer</span>
+                </div>
+                <button class="showcase-select-btn" data-template="minimal" type="button">
+                  Use this template <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Retro -->
+            <div class="showcase-card" data-template="retro">
+              <div class="showcase-card-glow glow-retro"></div>
+              <div class="showcase-phone-wrap">
+                <img src="/samples/sample-retro-music.png" alt="Retro Template - Luna & The Waves" loading="lazy" />
+                <span class="floating-tag tag-top">📻 Vintage Editorial</span>
+              </div>
+              <div class="showcase-card-info">
+                <div class="showcase-card-top">
+                  <span class="showcase-pill pill-retro">Retro</span>
+                  <span class="showcase-persona">Luna & The Waves • Musician</span>
+                </div>
+                <button class="showcase-select-btn" data-template="retro" type="button">
+                  Use this template <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Bold -->
+            <div class="showcase-card" data-template="bold">
+              <div class="showcase-card-glow glow-bold"></div>
+              <div class="showcase-phone-wrap">
+                <img src="/samples/sample-bold-business.png" alt="Bold Template - Kape & Co." loading="lazy" />
+                <span class="floating-tag tag-top">🔥 Neo-Brutalist</span>
+              </div>
+              <div class="showcase-card-info">
+                <div class="showcase-card-top">
+                  <span class="showcase-pill pill-bold">Bold</span>
+                  <span class="showcase-persona">Kape & Co. • Coffee Studio</span>
+                </div>
+                <button class="showcase-select-btn" data-template="bold" type="button">
+                  Use this template <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Classic -->
+            <div class="showcase-card" data-template="classic">
+              <div class="showcase-card-glow glow-classic"></div>
+              <div class="showcase-phone-wrap">
+                <img src="/samples/sample-classic-lifestyle.png" alt="Classic Template - Tessa Lee" loading="lazy" />
+                <span class="floating-tag tag-top">🌿 Timeless & Soft</span>
+              </div>
+              <div class="showcase-card-info">
+                <div class="showcase-card-top">
+                  <span class="showcase-pill pill-classic">Classic</span>
+                  <span class="showcase-persona">Tessa Lee • Photographer</span>
+                </div>
+                <button class="showcase-select-btn" data-template="classic" type="button">
+                  Use this template <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="showcase-footer-cta">
+          <div class="showcase-cta-box">
+            <span class="free-badge"><i class="fa-solid fa-gift"></i> 100% Free for Creators</span>
+            <h3>Start building your page in seconds.</h3>
+            <p>Enjoy unlimited links, all 5 curated templates, and instant setup. No surprise fees, no credit card required.</p>
+            <a href="#landing" class="showcase-cta-btn" id="showcaseClaimBtn">Claim your free link <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURES SECTION -->
+      <section class="landing-features" id="features">
+        <div class="features-header">
+          <span class="features-badge"><i class="fa-solid fa-bolt"></i> Why Bhio</span>
+          <h2>Everything you need. Zero cost.</h2>
+          <p>Built for creators who want a beautiful, fast, and unconstrained link in bio.</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-infinity"></i></div>
+            <h3>Unlimited Links</h3>
+            <p>Add all your social profiles, websites, videos, music, and shop links without artificial caps or limits.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>5 Curated Aesthetics</h3>
+            <p>Switch between Modern, Minimal, Retro, Bold, and Classic styles with a single tap to match your personal brand.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+            <h3>Live Phone Preview</h3>
+            <p>Drag, reorder, customize, and preview changes in real time on the interactive mockup before publishing.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3>100% Free Forever Core</h3>
+            <p>No credit card required, no surprise fees, and no expiring trials. What you build today is yours to keep.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ SECTION -->
+      <section class="landing-faq" id="faq">
+        <div class="faq-header">
+          <span class="faq-badge"><i class="fa-regular fa-circle-question"></i> FAQ</span>
+          <h2>Got questions? We've got answers.</h2>
+          <p>Everything you need to know about Bhio and our free public launch.</p>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item" open>
+            <summary class="faq-question">
+              <span>Is Bhio really 100% free?</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </summary>
+            <div class="faq-answer">
+              <p>Yes, absolutely! Claiming your handle, using all 5 curated templates, and adding unlimited links is completely free. There are no trial periods and no credit card required.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>How many links can I add?</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </summary>
+            <div class="faq-answer">
+              <p>Right now, you get unlimited links and social icons. Add your Instagram, TikTok, YouTube, Spotify, WhatsApp, portfolio, shop links, and more with zero restrictions.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>What happens when you add paid templates later?</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </summary>
+            <div class="faq-answer">
+              <p>All core features, existing templates, and created links will always remain free for our creators. Any future paid offerings will be purely optional premium designer templates for creators who want extra bespoke styles.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>How long does it take to set up?</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </summary>
+            <div class="faq-answer">
+              <p>Less than a minute! Pick your custom username, add your links, pick your favorite aesthetic, and your page is immediately live at <strong>bhio.link/yourname</strong>.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="landing-footer">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <img src="./icons/icon.svg" alt="Bhio" />
+            <span>bhio</span>
+          </div>
+          <p class="footer-copy">© 2026 Bhio. Beautiful link-in-bio pages. 100% Free for creators.</p>
+          <div class="footer-links">
+            <a href="#templates">Templates</a>
+            <a href="#features">Features</a>
+            <a href="#faq">FAQ</a>
+            <a href="#landing" class="footer-claim">Claim Link</a>
+          </div>
+        </div>
+      </footer>
     </section>
     <section class="auth-screen" id="authScreen">
       <nav class="auth-nav">
@@ -257,7 +624,7 @@
             <div class="fields">
               <div class="field">
                 <label for="displayName">Display name</label
-                ><input id="displayName" value="Tessa Lee" />
+                ><input id="displayName" value="" placeholder="e.g. Tessa Lee" />
               </div>
               <div class="field field-username">
                 <div class="field-header">
@@ -267,7 +634,8 @@
                 <div class="username-input-wrap">
                   <input
                     id="username"
-                    value="@tessalee"
+                    value=""
+                    placeholder="@yourname"
                     autocomplete="off"
                     spellcheck="false"
                   /><span
@@ -303,12 +671,11 @@
             </div>
             <div class="field">
               <label for="bio">Short Bio</label
-              ><textarea id="bio">
-Photographer, creative director, and collector of small beautiful things.</textarea>
+              ><textarea id="bio" placeholder="A short bio about yourself..."></textarea>
             </div>
             <div class="field">
               <label for="location">Location (optional)</label
-              ><input id="location" value="New York, NY" />
+              ><input id="location" value="" placeholder="e.g. Manila, Philippines" />
             </div>
           </div>
         </section>
@@ -364,7 +731,7 @@ Photographer, creative director, and collector of small beautiful things.</texta
               </div>
               <div class="field">
                 <label for="ctaButtonUrl">Button Link</label>
-                <input id="ctaButtonUrl" value="https://m.me/jasonpedere" placeholder="mailto: or https://" />
+                <input id="ctaButtonUrl" value="" placeholder="mailto: or https://" />
               </div>
             </div>
           </div>

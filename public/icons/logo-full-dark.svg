@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="360" height="96" viewBox="0 0 360 96">
   <defs>
     <linearGradient id="bhioGrad" x1="10%" y1="90%" x2="90%" y2="10%">
-      <stop offset="0%" stop-color="#005bf6"/>
-      <stop offset="100%" stop-color="#a82ffc"/>
+      <stop offset="0%" stop-color="#254b38"/>
+      <stop offset="100%" stop-color="#10b981"/>
     </linearGradient>
     <clipPath id="circleClip">
       <circle cx="218" cy="49" r="28"/>
@@ -14,7 +14,7 @@
 
   <!-- Avatar o symbol -->
   <circle cx="218" cy="49" r="28" fill="url(#bhioGrad)"/>
-  <circle cx="218" cy="49" r="21" fill="#0d111c"/>
+  <circle cx="218" cy="49" r="21" fill="#172219"/>
   <g clip-path="url(#circleClip)">
     <path d="M 203 73 C 204 59, 210 52, 218 52 C 226 52, 232 59, 233 73 Z" fill="url(#bhioGrad)"/>
     <circle cx="218" cy="43" r="6" fill="url(#bhioGrad)"/>

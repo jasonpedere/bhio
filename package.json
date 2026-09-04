@@ -9,6 +9,7 @@
     "deploy": "vite build && wrangler deploy"
   },
   "devDependencies": {
+    "playwright-core": "^1.62.1",
     "vite": "^7.1.5",
     "wrangler": "^4.0.0"
   }
