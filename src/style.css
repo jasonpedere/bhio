@@ -927,22 +927,26 @@ i[class*="fa-"],
   filter: brightness(0.92);
   transform: translateY(-1px);
 }
-.template-minimal .phone-cta-btn {
+.template-minimal .phone-cta-btn,
+.template-minimal .public-profile-cta-btn {
   background: transparent !important;
   border-bottom: 1px solid currentColor;
   border-radius: 0;
   box-shadow: none;
 }
-.template-modern .phone-cta-btn {
+.template-modern .phone-cta-btn,
+.template-modern .public-profile-cta-btn {
   border-radius: 16px;
   box-shadow: none;
 }
-.template-retro .phone-cta-btn {
+.template-retro .phone-cta-btn,
+.template-retro .public-profile-cta-btn {
   border-radius: 0;
   box-shadow: 4px 4px 0 #e76f51;
   font-family: "Playfair Display", serif;
 }
-.template-bold .phone-cta-btn {
+.template-bold .phone-cta-btn,
+.template-bold .public-profile-cta-btn {
   border-radius: 0;
   box-shadow: 4px 4px 0 #1e2440;
   font-family: "Space Grotesk", sans-serif;
@@ -1375,86 +1379,95 @@ i[class*="fa-"],
   font-size: 18px;
   cursor: pointer;
 }
-.phone-page.template-minimal {
-  background: #fff;
-  padding: 90px 32px 28px;
+.phone-page.template-minimal,
+.public-profile.template-minimal {
   color: #171717;
 }
-.template-minimal .phone-avatar {
+.template-minimal .phone-avatar,
+.template-minimal .public-profile-avatar {
   width: 66px;
   height: 66px;
   background: #fff;
   border: 1px solid #171717;
   box-shadow: none;
 }
-.template-minimal .phone-name {
+.template-minimal .phone-name,
+.template-minimal .public-profile-name,
+.template-minimal .public-profile h1 {
   font-size: 18px;
   font-weight: 500;
 }
-.template-minimal .phone-handle {
-  display: none;
+.template-minimal .phone-handle,
+.template-minimal .public-profile-handle {
+  display: none !important;
 }
-.template-minimal .phone-bio {
+.template-minimal .phone-bio,
+.template-minimal .public-profile-bio {
   font-size: 12px;
   max-width: 210px;
   margin-bottom: 30px;
 }
-.template-minimal .phone-link {
+.template-minimal .phone-link,
+.template-minimal .public-profile-link {
   min-height: 45px;
-  border-radius: 0;
-  background: transparent;
-  border-bottom: 1px solid #171717;
-  box-shadow: none;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: none;
+  border-bottom: 1px solid #171717 !important;
+  box-shadow: none !important;
   font-weight: 500;
+  color: #171717 !important;
 }
-.template-minimal .link-symbol {
+.template-minimal .link-symbol,
+.template-minimal .public-profile-link .link-symbol {
   display: none;
 }
-.template-minimal .social-symbol {
+.template-minimal .social-symbol,
+.template-minimal .public-profile-socials a {
   border: 1px solid #171717;
   border-radius: 0;
 }
-.phone-page.template-modern {
-  background: #dfe9ff;
-  color: #172219;
-  padding: 88px 25px 28px;
+.phone-page.template-modern,
+.public-profile.template-modern {
   font-family: "Space Grotesk", sans-serif;
 }
-.template-modern .phone-avatar {
+.template-modern .phone-avatar,
+.template-modern .public-profile-avatar {
   width: 76px;
   height: 76px;
   border-radius: 26px;
   transform: rotate(-5deg);
   border: 4px solid #fff;
 }
-.template-modern .phone-name {
+.template-modern .phone-name,
+.template-modern .public-profile-name,
+.template-modern .public-profile h1 {
   font-size: 23px;
   font-weight: 700;
 }
-.template-modern .phone-link {
+.template-modern .phone-link,
+.template-modern .public-profile-link {
   min-height: 54px;
   border-radius: 16px;
-  background: #172219;
   color: inherit;
   box-shadow: none;
-  text-align: left;
-  justify-content: flex-start;
 }
-.template-modern .link-symbol {
+.template-modern .link-symbol,
+.template-modern .public-profile-link .link-symbol {
   border-radius: 7px;
   color: currentColor;
 }
-.template-modern .social-symbol {
+.template-modern .social-symbol,
+.template-modern .public-profile-socials a {
   border-radius: 8px;
   background: #c9dcff;
 }
-.phone-page.template-retro {
-  background: #f4bd43;
-  color: #172c53;
+.phone-page.template-retro,
+.public-profile.template-retro {
   font-family: "Playfair Display", serif;
-  padding: 81px 29px 28px;
 }
-.template-retro .phone-avatar {
+.template-retro .phone-avatar,
+.template-retro .public-profile-avatar {
   width: 82px;
   height: 82px;
   border: 3px solid #172c53;
@@ -1462,80 +1475,147 @@ i[class*="fa-"],
   outline-offset: 3px;
   box-shadow: none;
 }
-.template-retro .phone-name {
+.template-retro .phone-name,
+.template-retro .public-profile-name,
+.template-retro .public-profile h1 {
   font-size: 24px;
+  font-family: "Playfair Display", serif;
 }
-.template-retro .phone-handle {
+.template-retro .phone-handle,
+.template-retro .public-profile-handle {
   font-family: "DM Mono", monospace;
   opacity: 0.8;
 }
-.template-retro .phone-link {
+.template-retro .phone-link,
+.template-retro .public-profile-link {
   min-height: 48px;
-  border-radius: 0;
-  background: #172c53;
+  border-radius: 0 !important;
   color: inherit;
-  box-shadow: 4px 4px 0 #e97051;
+  box-shadow: 4px 4px 0 #e97051 !important;
 }
-.template-retro .link-symbol {
+.template-retro .link-symbol,
+.template-retro .public-profile-link .link-symbol {
   width: 20px;
   height: 20px;
   border: 1px solid currentColor;
   border-radius: 0;
   color: currentColor;
 }
-.template-retro .social-symbol {
+.template-retro .social-symbol,
+.template-retro .public-profile-socials a {
   border-radius: 0;
   border: 1px solid #172c53;
 }
-.phone-page.template-bold {
-  background: #ee725b;
-  color: #1e2440;
-  padding: 65px 20px 28px;
+.phone-page.template-bold,
+.public-profile.template-bold {
   font-family: "Space Grotesk", sans-serif;
 }
-.template-bold .phone-avatar {
+.template-bold .phone-avatar,
+.template-bold .public-profile-avatar {
   width: 105px;
   height: 105px;
-  border-radius: 0;
+  border-radius: 0 !important;
   border: 5px solid #1e2440;
   box-shadow: 7px 7px 0 #d9ff6a;
 }
-.template-bold .phone-name {
+.template-bold .phone-name,
+.template-bold .public-profile-name,
+.template-bold .public-profile h1 {
   font-size: 31px;
   line-height: 0.94;
   font-weight: 700;
   text-transform: uppercase;
+  font-family: "Space Grotesk", sans-serif;
 }
-.template-bold .phone-handle {
+.template-bold .phone-handle,
+.template-bold .public-profile-handle {
   font-weight: 700;
   opacity: 1;
   margin-top: 9px;
 }
-.template-bold .phone-bio {
+.template-bold .phone-bio,
+.template-bold .public-profile-bio {
   font-size: 13px;
   font-weight: 500;
   margin-top: 13px;
 }
-.template-bold .phone-link {
+.template-bold .phone-link,
+.template-bold .public-profile-link {
   min-height: 58px;
-  border-radius: 0;
-  background: #d9ff6a;
+  border-radius: 0 !important;
   color: inherit;
-  box-shadow: 4px 4px 0 #1e2440;
+  box-shadow: 4px 4px 0 #1e2440 !important;
   font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
 }
-.template-bold .link-symbol {
+.template-bold .link-symbol,
+.template-bold .public-profile-link .link-symbol {
   width: 25px;
   height: 25px;
   border-radius: 0;
   color: currentColor;
 }
-.template-bold .social-symbol {
+.template-bold .social-symbol,
+.template-bold .public-profile-socials a {
   border-radius: 0;
   background: #1e2440;
   color: #d9ff6a;
+}
+
+/* Dark theme high-contrast support */
+.is-dark-theme,
+.is-dark-theme .public-profile-name,
+.is-dark-theme .phone-name {
+  color: #f8fafc;
+}
+.is-dark-theme .phone-handle,
+.is-dark-theme .public-profile-handle {
+  color: rgba(255, 255, 255, 0.72) !important;
+  opacity: 0.85;
+}
+.is-dark-theme .phone-bio,
+.is-dark-theme .public-profile-bio,
+.is-dark-theme .phone-headline,
+.is-dark-theme .public-profile-headline {
+  color: rgba(255, 255, 255, 0.9);
+}
+.is-dark-theme .phone-chip,
+.is-dark-theme .public-profile-chip {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+}
+.is-dark-theme .interest-pill {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+}
+.is-dark-theme .public-profile-about-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f8fafc;
+}
+.is-dark-theme .public-profile-about-header {
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+}
+.is-dark-theme .public-profile-cta-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f8fafc;
+}
+.is-dark-theme .public-profile-cta-desc {
+  color: rgba(255, 255, 255, 0.8);
+}
+.is-dark-theme .public-profile-footer,
+.is-dark-theme .phone-footer {
+  color: rgba(255, 255, 255, 0.6);
+}
+.is-dark-theme .public-share {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
 }
 .share-modal {
   position: fixed;
@@ -3543,6 +3623,10 @@ html.is-public-profile body {
   border-top: 1px solid #e8ebe6;
   padding: 38px clamp(20px, 6vw, 90px);
   background: #fafbf8;
+  margin-left: calc(-1 * clamp(24px, 6vw, 90px));
+  margin-right: calc(-1 * clamp(24px, 6vw, 90px));
+  width: calc(100% + 2 * clamp(24px, 6vw, 90px));
+  box-sizing: border-box;
 }
 
 .footer-inner {
@@ -3558,7 +3642,7 @@ html.is-public-profile body {
 .footer-brand {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -1px;
@@ -3575,11 +3659,14 @@ html.is-public-profile body {
   font-size: 13px;
   color: #768078;
   margin: 0;
+  line-height: 1.5;
 }
 
 .footer-links {
   display: flex;
-  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
 }
 
 .footer-links a {
@@ -3587,16 +3674,33 @@ html.is-public-profile body {
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .footer-links a:hover {
   color: #172219;
 }
 
+.footer-links .footer-claim {
+  color: var(--forest, #254b38);
+  font-weight: 700;
+}
+
+.footer-links .footer-claim:hover {
+  color: #172219;
+}
+
 @media (max-width: 1024px) {
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .landing-footer {
+    margin-left: -24px;
+    margin-right: -24px;
+    width: calc(100% + 48px);
   }
 }
 
@@ -3611,10 +3715,37 @@ html.is-public-profile body {
   .landing-faq {
     padding: 30px 16px 80px;
   }
+  .landing-footer {
+    margin-left: -24px;
+    margin-right: -24px;
+    width: calc(100% + 48px);
+    padding: 36px 20px 42px;
+  }
   .footer-inner {
     flex-direction: column;
     text-align: center;
-    gap: 16px;
+    gap: 18px;
+  }
+  .footer-brand {
+    order: 1;
+    justify-content: center;
+  }
+  .footer-links {
+    order: 2;
+    justify-content: center;
+    gap: 10px 16px;
+    max-width: 100%;
+  }
+  .footer-links a {
+    padding: 4px 6px;
+    font-size: 13px;
+  }
+  .footer-copy {
+    order: 3;
+    font-size: 12px;
+    line-height: 1.55;
+    max-width: 320px;
+    margin: 2px auto 0;
   }
 }
 
@@ -4273,47 +4404,63 @@ html.is-public-profile body {
   .phone-footer {
     padding-top: 30px;
   }
-  .template-minimal .phone-avatar {
+  .template-minimal .phone-avatar,
+  .template-minimal .public-profile-avatar {
     width: 84px;
     height: 84px;
   }
-  .template-minimal .phone-name {
+  .template-minimal .phone-name,
+  .template-minimal .public-profile-name,
+  .template-minimal .public-profile h1 {
     font-size: 23px;
   }
-  .template-minimal .phone-link {
+  .template-minimal .phone-link,
+  .template-minimal .public-profile-link {
     min-height: 53px;
     font-size: 15px;
   }
-  .template-modern .phone-avatar {
+  .template-modern .phone-avatar,
+  .template-modern .public-profile-avatar {
     width: 94px;
     height: 94px;
   }
-  .template-modern .phone-name {
+  .template-modern .phone-name,
+  .template-modern .public-profile-name,
+  .template-modern .public-profile h1 {
     font-size: 28px;
   }
-  .template-modern .phone-link {
+  .template-modern .phone-link,
+  .template-modern .public-profile-link {
     min-height: 60px;
     font-size: 16px;
   }
-  .template-retro .phone-avatar {
+  .template-retro .phone-avatar,
+  .template-retro .public-profile-avatar {
     width: 96px;
     height: 96px;
   }
-  .template-retro .phone-name {
+  .template-retro .phone-name,
+  .template-retro .public-profile-name,
+  .template-retro .public-profile h1 {
     font-size: 29px;
   }
-  .template-retro .phone-link {
+  .template-retro .phone-link,
+  .template-retro .public-profile-link {
     min-height: 56px;
     font-size: 16px;
   }
-  .template-bold .phone-avatar {
+  .template-bold .phone-avatar,
+  .template-bold .public-profile-avatar {
     width: 116px;
     height: 116px;
   }
-  .template-bold .phone-name {
+  .template-bold .phone-name,
+  .template-bold .public-profile-name,
+  .template-bold .public-profile h1 {
     font-size: 38px;
   }
-  .template-bold .phone-link {
+  .template-bold .phone-link,
+  .template-bold .public-profile-link {
     min-height: 64px;
     font-size: 16px;
   }
@@ -4539,6 +4686,20 @@ html.is-public-profile body {
   }
   .profile-row {
     grid-template-columns: 1fr;
+  }
+  .landing-footer {
+    padding: 30px 16px 36px;
+  }
+  .footer-links {
+    gap: 8px 12px;
+  }
+  .footer-links a {
+    font-size: 12.5px;
+    padding: 3px 4px;
+  }
+  .footer-copy {
+    font-size: 11.5px;
+    max-width: 290px;
   }
 }
 .phone-avatar {

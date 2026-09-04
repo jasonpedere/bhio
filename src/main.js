@@ -709,6 +709,8 @@ function openEditor() {
 }
 window.openEditor = openEditor;
 window.applyTemplatePreset = applyTemplatePreset;
+window.state = state;
+window.getPages = () => pages;
 function openLanding() {
   clearTimeout(saveTimer);
   document.documentElement.classList.remove("has-session");
@@ -1305,6 +1307,9 @@ function syncAll() {
   $("#phonePage").dataset.align = state.linkStyle.align || "center";
   const currentBg = state.background || "#e6f1dc";
   $("#phonePage").style.background = currentBg;
+  const isDarkBg = isDarkColor(currentBg);
+  $("#phonePage").classList.toggle("is-dark-theme", isDarkBg);
+  $("#phonePage").style.color = isDarkBg ? "#ffffff" : "#172219";
   const deviceEl = $(".device");
   if (deviceEl) deviceEl.style.background = currentBg;
   const previewAreaEl = $("#previewArea");
@@ -1377,7 +1382,11 @@ async function saveProfile() {
       cta_desc: (page.ctaDesc || "").trim(),
       cta_button_text: (page.ctaButtonText || "").trim(),
       cta_button_url: (page.ctaButtonUrl || "").trim(),
-      settings: { pages },
+      settings: {
+        ...(page.settings || state),
+        template: state.template || page.settings?.template || DEFAULT_TEMPLATE,
+        pages,
+      },
       updated_at: new Date().toISOString(),
     };
     let { error } = await supabaseClient.from("profiles").upsert(extendedPayload);
@@ -1390,7 +1399,11 @@ async function saveProfile() {
         location: (page.location || "").trim(),
         page_title: (page.pageTitle || "").trim(),
         visibility: page.visibility !== false,
-        settings: { pages },
+        settings: {
+          ...(page.settings || state),
+          template: state.template || page.settings?.template || DEFAULT_TEMPLATE,
+          pages,
+        },
         updated_at: new Date().toISOString(),
       };
       const fallback = await supabaseClient.from("profiles").upsert(basePayload);
@@ -1794,12 +1807,19 @@ $("#avatarUpload").addEventListener("change", async (event) => {
 $("#templateGrid").addEventListener("click", (event) => {
   const template = event.target.closest("[data-template]");
   if (!template) return;
-  state.template = template.dataset.template;
-  document
-    .querySelectorAll(".template")
-    .forEach((item) => item.classList.toggle("active", item === template));
-  $("#phonePage").className =
-    `phone-page ${state.template === "classic" ? "" : "template-" + state.template}`;
+  const templateName = template.dataset.template;
+  if (templateName && TEMPLATE_PRESETS[templateName]) {
+    applyTemplatePreset(templateName);
+  } else {
+    state.template = templateName;
+    document
+      .querySelectorAll(".template")
+      .forEach((item) => item.classList.toggle("active", item === template));
+    $("#phonePage").className =
+      `phone-page ${state.template === "classic" ? "" : "template-" + state.template}`;
+  }
+  saveCurrentPage();
+  saveDraftLocally();
   queueSave();
 });
 $("#align").addEventListener("change", (event) => {
@@ -2407,11 +2427,21 @@ function renderPublicProfile(profile) {
     page.settings && typeof page.settings === "object"
       ? page.settings
       : settings;
-  const background = pageSettings.background || "#e6f1dc";
-  const font = pageSettings.font || "DM Sans";
-  const template = pageSettings.template || "classic";
-  const radius = pageSettings.radius ?? 8;
-  const linkStyle = pageSettings.linkStyle || {
+  const template =
+    page.template ||
+    pageSettings.template ||
+    settings.template ||
+    profile.template ||
+    "classic";
+  const preset = TEMPLATE_PRESETS[template] || TEMPLATE_PRESETS.classic || {};
+  const background =
+    pageSettings.background || settings.background || preset.background || "#e6f1dc";
+  const font = pageSettings.font || settings.font || preset.font || "DM Sans";
+  const radius =
+    pageSettings.radius !== undefined && pageSettings.radius !== null
+      ? pageSettings.radius
+      : (settings.radius !== undefined && settings.radius !== null ? settings.radius : (preset.radius ?? 8));
+  const linkStyle = pageSettings.linkStyle || settings.linkStyle || preset.linkStyle || {
     color: "#ffffff",
     align: "center",
     iconPosition: "left",
@@ -2419,8 +2449,9 @@ function renderPublicProfile(profile) {
   };
   const align = linkStyle.align || "center";
   const iconPosition = linkStyle.iconPosition || "left";
-  const linkColor = linkStyle.color || "#ffffff";
+  const linkColor = linkStyle.color || preset.linkStyle?.color || "#ffffff";
   const isDarkLink = isDarkColor(linkColor);
+  const isDarkBg = isDarkColor(background);
 
   const savedLinks = Array.isArray(pageSettings.links)
     ? pageSettings.links
@@ -2433,8 +2464,10 @@ function renderPublicProfile(profile) {
     ? pageSettings.socials.filter((social) => social.enabled)
     : [];
   const content = document.createElement("main");
-  content.className = `public-profile ${template === "classic" ? "" : "template-" + template}`;
+  content.className = `public-profile template-${template}`;
+  content.classList.toggle("is-dark-theme", isDarkBg);
   content.style.background = background;
+  content.style.color = isDarkBg ? "#ffffff" : "#172219";
   document.documentElement.style.background = background;
   document.body.style.background = background;
   content.style.fontFamily = `'${font}', sans-serif`;
@@ -2471,11 +2504,12 @@ function renderPublicProfile(profile) {
   if (pageSettings.profileImage) {
     const avatar = document.createElement("div");
     avatar.className = "public-profile-avatar";
-    avatar.dataset.shape = pageSettings.profileShape || "circle";
+    avatar.dataset.shape = pageSettings.profileShape || preset.profileShape || "circle";
     avatar.style.backgroundImage = `url('${pageSettings.profileImage}')`;
     inner.append(avatar);
   }
   const name = document.createElement("h1");
+  name.className = "public-profile-name";
   name.textContent =
     page.displayName || profile.display_name || profile.username;
   inner.append(name);
