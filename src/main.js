@@ -2588,6 +2588,199 @@ else {
   }
   restoreSession();
   updatePreviewZoom();
+  initLegalModalAndCookies();
+}
+
+// ==========================================================================
+// LEGAL / ABOUT MODAL DIALOGS & COOKIE CONSENT
+// ==========================================================================
+
+const LEGAL_DOCS = {
+  about: {
+    badge: "Our Story & Mission",
+    title: "About Bhio",
+    updated: "September 2026",
+    html: `
+      <h3>Welcome to Bhio</h3>
+      <p>Bhio is a modern, lightweight, and aesthetic link-in-bio platform designed to give creators, artists, entrepreneurs, developers, and brands an unforgettable home on the web.</p>
+      
+      <h3>Our Mission</h3>
+      <p>We built Bhio because traditional link tools have become overly complex, cluttered with ads, and full of restrictive paywalls on basic creator features. We believe sharing your world should be effortless, fast, and free.</p>
+      
+      <h3>What Sets Us Apart</h3>
+      <ul>
+        <li><strong>Unlimited Links & Socials:</strong> Connect all your social profiles, websites, music, videos, shops, and messaging channels with zero artificial caps.</li>
+        <li><strong>5 Curated Aesthetics:</strong> Choose from Modern, Minimal, Retro, Bold, and Classic layouts crafted to match your personal identity.</li>
+        <li><strong>Real-Time Live Preview:</strong> See your changes instantly on a high-fidelity interactive phone mockup as you type.</li>
+        <li><strong>Fast & Edge-Delivered:</strong> Powered by Cloudflare's global edge network, ensuring your bio page loads in milliseconds anywhere in the world.</li>
+        <li><strong>Creator-First & Free:</strong> 100% free core experience with no credit card required and no surprise fees.</li>
+      </ul>
+
+      <h3>Get In Touch</h3>
+      <p>Have questions, feature requests, or partnership ideas? We'd love to hear from you. Contact our team at <a href="mailto:support@bhio.link" style="color: #254b38; font-weight: 600;">support@bhio.link</a>.</p>
+    `
+  },
+  terms: {
+    badge: "Terms of Service",
+    title: "Terms of Service",
+    updated: "September 2026",
+    html: `
+      <h3>1. Acceptance of Terms</h3>
+      <p>By accessing or using Bhio (bhio.link), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service.</p>
+
+      <h3>2. User Accounts & Registration</h3>
+      <p>To create a bio page, you must provide a valid email address and choose an available username. You are responsible for maintaining the confidentiality of your password and for all activity conducted through your account.</p>
+
+      <h3>3. Acceptable Use Policy</h3>
+      <p>You agree to use Bhio only for lawful purposes. You expressly agree NOT to:</p>
+      <ul>
+        <li>Publish or link to phishing sites, malware, deceptive schemes, or fraudulent activities.</li>
+        <li>Distribute illegal, defamatory, abusive, threatening, or infringing material.</li>
+        <li>Impersonate any person, brand, or organization with intent to mislead the public.</li>
+        <li>Use automated scripts or bots to bulk-register usernames or scrape data.</li>
+      </ul>
+
+      <h3>4. Content Ownership & License</h3>
+      <p>You retain full ownership and intellectual property rights to all content, text, links, and media that you upload to your Bhio page. By publishing on Bhio, you grant us a limited, worldwide, royalty-free license solely to host, display, and distribute your profile on the web.</p>
+
+      <h3>5. Platform Rights & Account Termination</h3>
+      <p>We reserve the right to modify, suspend, or terminate accounts and reclaim usernames that violate these Terms of Service, compromise system security, or harm our community.</p>
+
+      <h3>6. Disclaimer of Warranties</h3>
+      <p>Bhio is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind, whether express or implied. We do not guarantee uninterrupted or error-free service.</p>
+
+      <h3>7. Changes to Terms</h3>
+      <p>We may update these terms periodically. Continued use of Bhio following notice of changes constitutes your acceptance of the revised Terms of Service.</p>
+    `
+  },
+  privacy: {
+    badge: "Privacy Policy",
+    title: "Privacy Policy",
+    updated: "September 2026",
+    html: `
+      <h3>1. Overview</h3>
+      <p>At Bhio (bhio.link), your privacy is our top priority. This Privacy Policy outlines what data we collect, how it is used, and your rights regarding your personal information.</p>
+
+      <h3>2. Information We Collect</h3>
+      <ul>
+        <li><strong>Account Information:</strong> When you register, we collect your email address, chosen handle (@username), and hashed password (securely stored via Supabase Auth).</li>
+        <li><strong>Profile Content:</strong> The links, titles, bio text, avatar images, social handles, and theme preferences you choose to display publicly on your page.</li>
+        <li><strong>Analytics & Technical Data:</strong> Aggregated, non-personally identifiable technical information such as device type, browser, and user session metrics (via Microsoft Clarity) to diagnose bugs and improve responsiveness.</li>
+      </ul>
+
+      <h3>3. How We Use Your Information</h3>
+      <p>We use your data solely to deliver and improve our services: to publish your public bio link, authenticate your sessions, prevent spam and abuse, and optimize platform speed. <strong>We never sell, rent, or monetize your personal information to third-party data brokers.</strong></p>
+
+      <h3>4. Cookies & Local Storage</h3>
+      <ul>
+        <li><strong>Essential Local Storage:</strong> Used to maintain your active login session and remember cookie consent preferences.</li>
+        <li><strong>Analytics Cookies:</strong> Microsoft Clarity uses first-party cookies (_clck, _clsk) to analyze user interaction heatmaps and session patterns. You can disable or clear cookies anytime in your browser settings.</li>
+      </ul>
+
+      <h3>5. Third-Party Infrastructure</h3>
+      <p>Bhio relies on trusted, world-class infrastructure providers:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Encrypted database and user authentication.</li>
+        <li><strong>Cloudflare:</strong> Secure global content delivery network (CDN) and DDoS protection.</li>
+        <li><strong>Microsoft Clarity:</strong> Behavioral analytics and performance diagnostics.</li>
+      </ul>
+
+      <h3>6. Your Rights & Data Deletion</h3>
+      <p>You can edit or delete any link, customize your profile, or completely delete your account and all associated data at any time from your account settings or by contacting <a href="mailto:support@bhio.link" style="color: #254b38; font-weight: 600;">support@bhio.link</a>.</p>
+    `
+  }
+};
+
+function openLegalModal(key) {
+  const doc = LEGAL_DOCS[key];
+  if (!doc) return;
+
+  const modal = $("#legalModal");
+  const badge = $("#legalModalBadge");
+  const title = $("#legalModalTitle");
+  const body = $("#legalModalBody");
+  const updated = $("#legalLastUpdated");
+
+  if (badge) badge.textContent = doc.badge;
+  if (title) title.textContent = doc.title;
+  if (body) body.innerHTML = doc.html;
+  if (updated) updated.textContent = `Last updated: ${doc.updated}`;
+
+  if (modal) {
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function closeLegalModal() {
+  const modal = $("#legalModal");
+  if (modal) {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+  if (["#about", "#terms", "#privacy"].includes(window.location.hash)) {
+    history.replaceState(null, null, " ");
+  }
+}
+
+function initLegalModalAndCookies() {
+  // Modal close buttons
+  $("#legalModalClose")?.addEventListener("click", closeLegalModal);
+  $("#legalModalDone")?.addEventListener("click", closeLegalModal);
+
+  // Click outside to close
+  $("#legalModal")?.addEventListener("click", (e) => {
+    if (e.target === $("#legalModal")) {
+      closeLegalModal();
+    }
+  });
+
+  // ESC key to close
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && $("#legalModal")?.classList.contains("open")) {
+      closeLegalModal();
+    }
+  });
+
+  // Open modal links
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".open-legal-btn");
+    if (btn) {
+      e.preventDefault();
+      const legalKey = btn.getAttribute("data-legal");
+      if (legalKey) openLegalModal(legalKey);
+    }
+  });
+
+  // Hash-based direct access (e.g. bhio.link/#terms)
+  function checkHash() {
+    const hash = window.location.hash.replace(/^#/, "");
+    if (["about", "terms", "privacy"].includes(hash)) {
+      openLegalModal(hash);
+    }
+  }
+  window.addEventListener("hashchange", checkHash);
+  checkHash();
+
+  // Cookie Consent Banner
+  const cookieBanner = $("#cookieBanner");
+  try {
+    const consent = localStorage.getItem("bhio-cookie-consent");
+    if (!consent && cookieBanner) {
+      setTimeout(() => {
+        cookieBanner.classList.add("show");
+      }, 1000);
+    }
+  } catch (err) {}
+
+  $("#cookieAcceptBtn")?.addEventListener("click", () => {
+    try {
+      localStorage.setItem("bhio-cookie-consent", "accepted");
+    } catch (err) {}
+    cookieBanner?.classList.remove("show");
+  });
 }
 if ("serviceWorker" in navigator) {
   if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {

@@ -115,6 +115,27 @@
                 "name": "Create Free Page",
                 "description": "Claim your custom username and create your link-in-bio page in seconds.",
                 "url": "https://bhio.link/#landing"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 5,
+                "name": "About Bhio",
+                "description": "Learn about our mission and free creator-first link-in-bio platform.",
+                "url": "https://bhio.link/#about"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 6,
+                "name": "Terms of Service",
+                "description": "Understand user rights, acceptable use, and platform terms.",
+                "url": "https://bhio.link/#terms"
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "position": 7,
+                "name": "Privacy Policy",
+                "description": "How we handle, secure, and respect your personal data and cookies.",
+                "url": "https://bhio.link/#privacy"
               }
             ]
           },
@@ -525,6 +546,9 @@
             <a href="#templates">Templates</a>
             <a href="#features">Features</a>
             <a href="#faq">FAQ</a>
+            <a href="#about" class="open-legal-btn" data-legal="about">About</a>
+            <a href="#terms" class="open-legal-btn" data-legal="terms">Terms</a>
+            <a href="#privacy" class="open-legal-btn" data-legal="privacy">Privacy</a>
             <a href="#landing" class="footer-claim">Claim Link</a>
           </div>
         </div>
@@ -1057,6 +1081,43 @@
         </div>
       </div>
     </main>
+
+    <!-- LEGAL / ABOUT MODAL DIALOG -->
+    <div class="legal-modal-backdrop" id="legalModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="legalModalTitle">
+      <div class="legal-modal-card">
+        <div class="legal-modal-header">
+          <div class="legal-modal-title-wrap">
+            <span class="legal-modal-badge" id="legalModalBadge">Information</span>
+            <h2 id="legalModalTitle">Terms of Service</h2>
+          </div>
+          <button class="legal-modal-close" id="legalModalClose" aria-label="Close modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="legal-modal-body" id="legalModalBody">
+          <!-- Dynamically populated by JS -->
+        </div>
+        <div class="legal-modal-footer">
+          <span class="legal-last-updated" id="legalLastUpdated">Last updated: September 2026</span>
+          <button class="legal-modal-done-btn" id="legalModalDone" type="button">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COOKIE CONSENT BANNER -->
+    <div class="cookie-banner" id="cookieBanner" aria-live="polite" role="region" aria-label="Cookie consent">
+      <div class="cookie-banner-content">
+        <div class="cookie-icon"><i class="fa-solid fa-cookie-bite"></i></div>
+        <p class="cookie-text">
+          We use essential cookies and basic analytics to give you the best link-in-bio experience.
+          By using Bhio, you agree to our <a href="#privacy" class="open-legal-btn" data-legal="privacy">Privacy Policy</a>.
+        </p>
+      </div>
+      <div class="cookie-actions">
+        <button class="cookie-accept-btn" id="cookieAcceptBtn" type="button">Accept</button>
+      </div>
+    </div>
+
     <script src="/supabase-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="/src/main.js"></script>

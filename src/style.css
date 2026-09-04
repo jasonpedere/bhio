@@ -3623,6 +3623,264 @@ html.is-public-profile body {
   }
 }
 
+/* ==========================================================================
+   LEGAL / ABOUT MODAL DIALOG & COOKIE BANNER
+   ========================================================================== */
+
+/* Legal Modal Backdrop */
+.legal-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(23, 34, 25, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+.legal-modal-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.legal-modal-card {
+  background: #ffffff;
+  border: 1px solid #e5ebe3;
+  border-radius: 22px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px -12px rgba(23, 34, 25, 0.25);
+  transform: scale(0.96) translateY(10px);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+}
+
+.legal-modal-backdrop.open .legal-modal-card {
+  transform: scale(1) translateY(0);
+}
+
+.legal-modal-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid #edf1eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  background: #fff;
+}
+
+.legal-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: #eaf3e8;
+  color: #254b38;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.legal-modal-title-wrap h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #172219;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.legal-modal-close {
+  border: 1px solid #e2e8e0;
+  background: #fafbf8;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #556257;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.legal-modal-close:hover {
+  background: #172219;
+  color: #ffffff;
+  border-color: #172219;
+}
+
+.legal-modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  font-size: 14.5px;
+  line-height: 1.68;
+  color: #4a574d;
+}
+
+.legal-modal-body h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #172219;
+  margin: 22px 0 10px;
+  letter-spacing: -0.3px;
+}
+
+.legal-modal-body h3:first-child {
+  margin-top: 0;
+}
+
+.legal-modal-body p {
+  margin: 0 0 14px;
+}
+
+.legal-modal-body ul {
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+
+.legal-modal-body li {
+  margin-bottom: 8px;
+}
+
+.legal-modal-body strong {
+  color: #172219;
+}
+
+.legal-modal-footer {
+  padding: 16px 28px;
+  border-top: 1px solid #edf1eb;
+  background: #fafbf8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.legal-last-updated {
+  font-size: 12px;
+  color: #768078;
+}
+
+.legal-modal-done-btn {
+  padding: 9px 22px;
+  background: #172219;
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.legal-modal-done-btn:hover {
+  background: #254b38;
+}
+
+/* Cookie Consent Banner */
+.cookie-banner {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 440px;
+  background: #ffffff;
+  border: 1px solid #e1e7de;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(23, 34, 25, 0.16);
+  padding: 18px 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transform: translateY(140px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease;
+}
+
+.cookie-banner.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cookie-banner-content {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.cookie-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #eaf3e8;
+  color: #254b38;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.cookie-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #4a574d;
+}
+
+.cookie-text a {
+  color: #254b38;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cookie-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cookie-accept-btn {
+  padding: 8px 20px;
+  background: #172219;
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cookie-accept-btn:hover {
+  background: #254b38;
+}
+
+@media (max-width: 600px) {
+  .cookie-banner {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    max-width: none;
+  }
+}
+
 .auth-screen {
   min-height: 100vh;
   display: none;
