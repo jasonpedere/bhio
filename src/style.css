@@ -973,6 +973,7 @@ i[class*="fa-"],
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
   max-width: 100% !important;
+  color: inherit !important;
 }
 .link-desc-text {
   display: block !important;
@@ -984,6 +985,7 @@ i[class*="fa-"],
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
   max-width: 100% !important;
+  color: inherit !important;
 }
 .phone-location {
   font-size: 11px;
@@ -1104,7 +1106,7 @@ i[class*="fa-"],
 .theme-retro .phone-link {
   border-radius: 0;
   background: #202c50;
-  color: #fff6d7;
+  color: inherit;
   box-shadow: 4px 4px 0 #e76f51;
 }
 .phone-page.theme-modern {
@@ -1113,7 +1115,7 @@ i[class*="fa-"],
 .theme-modern .phone-link {
   border-radius: 999px;
   background: #172219;
-  color: #fff;
+  color: inherit;
 }
 .phone-page.theme-bold {
   background: #ee725b;
@@ -1122,7 +1124,7 @@ i[class*="fa-"],
 .theme-bold .phone-link {
   border-radius: 0;
   background: #d9ff6a;
-  color: #1e2440;
+  color: inherit;
 }
 .link-options {
   grid-column: 2 / 5;
@@ -1433,15 +1435,14 @@ i[class*="fa-"],
   min-height: 54px;
   border-radius: 16px;
   background: #172219;
-  color: #fff;
+  color: inherit;
   box-shadow: none;
   text-align: left;
   justify-content: flex-start;
 }
 .template-modern .link-symbol {
   border-radius: 7px;
-  background: #fff;
-  color: #172219;
+  color: currentColor;
 }
 .template-modern .social-symbol {
   border-radius: 8px;
@@ -1472,14 +1473,15 @@ i[class*="fa-"],
   min-height: 48px;
   border-radius: 0;
   background: #172c53;
-  color: #fff6d7;
+  color: inherit;
   box-shadow: 4px 4px 0 #e97051;
 }
 .template-retro .link-symbol {
   width: 20px;
   height: 20px;
-  border: 1px solid #fff6d7;
+  border: 1px solid currentColor;
   border-radius: 0;
+  color: currentColor;
 }
 .template-retro .social-symbol {
   border-radius: 0;
@@ -1518,7 +1520,7 @@ i[class*="fa-"],
   min-height: 58px;
   border-radius: 0;
   background: #d9ff6a;
-  color: #1e2440;
+  color: inherit;
   box-shadow: 4px 4px 0 #1e2440;
   font-size: 14px;
   font-weight: 700;
@@ -1528,8 +1530,7 @@ i[class*="fa-"],
   width: 25px;
   height: 25px;
   border-radius: 0;
-  background: #1e2440;
-  color: #d9ff6a;
+  color: currentColor;
 }
 .template-bold .social-symbol {
   border-radius: 0;

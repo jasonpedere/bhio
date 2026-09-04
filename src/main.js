@@ -88,6 +88,27 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+function isDarkColor(color) {
+  if (!color || typeof color !== "string") return false;
+  const str = color.trim().toLowerCase();
+  if (str.startsWith("rgb")) {
+    const match = str.match(/\d+/g);
+    if (match && match.length >= 3) {
+      const [r, g, b] = match.map(Number);
+      return (r * 299 + g * 587 + b * 114) / 1000 < 140;
+    }
+  }
+  let c = str.replace(/^#/, "");
+  if (c.length === 3) {
+    c = c.split("").map((x) => x + x).join("");
+  }
+  if (c.length !== 6) return false;
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return false;
+  return (r * 299 + g * 587 + b * 114) / 1000 < 140;
+}
 const MAX_PAGES = 3;
 let pages = [];
 let currentPageIndex = 0;
@@ -187,7 +208,7 @@ function renderPreviewDetails() {
   const ctaBtnText = $("#ctaButtonText") ? $("#ctaButtonText").value.trim() : "Send a message";
   const ctaBtnUrl = $("#ctaButtonUrl") ? $("#ctaButtonUrl").value.trim() : "";
   const ctaLinkColor = state.linkStyle?.color || "#ffffff";
-  const ctaTextColor = ctaLinkColor === "#172219" ? "#fff" : "#172219";
+  const ctaTextColor = isDarkColor(ctaLinkColor) ? "#ffffff" : "#172219";
 
   if (ctaEl) {
     if (ctaEnabled && (ctaTitle || ctaDesc)) {
@@ -367,18 +388,37 @@ const LOCAL_DRAFT_KEY = "bhio-draft";
 function setSaveStatus(text) {
   $("#saveStatus").textContent = text;
 }
+function getActiveUserId() {
+  if (currentSessionUserId) return currentSessionUserId;
+  try {
+    const raw =
+      localStorage.getItem(AUTH_STORAGE_KEY) ||
+      localStorage.getItem("solebio-auth");
+    if (raw) {
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      const uid = parsed?.user?.id || parsed?.currentSession?.user?.id;
+      if (uid) return uid;
+    }
+  } catch (e) {}
+  return null;
+}
 function getDraftKey(userId) {
-  return userId ? `bhio-draft-${userId}` : "bhio-draft-guest";
+  const uid = userId || getActiveUserId();
+  return uid ? `bhio-draft-${uid}` : "bhio-draft-guest";
 }
 function saveDraftLocally() {
   try {
     saveCurrentPage();
-    if (!currentSessionUserId) return;
-    const key = getDraftKey(currentSessionUserId);
-    localStorage.setItem(
-      key,
-      JSON.stringify({ pages, currentPageIndex, timestamp: Date.now() }),
-    );
+    const uid = getActiveUserId();
+    const key = getDraftKey(uid);
+    const draftData = {
+      userId: uid || "guest",
+      pages,
+      currentPageIndex,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(key, JSON.stringify(draftData));
+    localStorage.setItem(LOCAL_DRAFT_KEY, JSON.stringify(draftData));
     setSaveStatus("Saved locally");
   } catch (error) {
     console.error("Could not save local draft:", error);
@@ -387,12 +427,21 @@ function saveDraftLocally() {
 }
 function restoreDraft(userId) {
   try {
-    if (!userId) return false;
-    const key = getDraftKey(userId);
-    const rawDraft = localStorage.getItem(key);
+    const uid = userId || getActiveUserId();
+    const key = getDraftKey(uid);
+    let rawDraft = localStorage.getItem(key);
+    if (!rawDraft) {
+      rawDraft =
+        localStorage.getItem("bhio-draft-guest") ||
+        localStorage.getItem(LOCAL_DRAFT_KEY) ||
+        localStorage.getItem("solebio-draft");
+    }
     const draft = JSON.parse(rawDraft || "null");
     if (!draft || !Array.isArray(draft.pages) || !draft.pages.length)
       return false;
+    if (uid && draft.userId && draft.userId !== "guest" && draft.userId !== uid) {
+      return false;
+    }
     pages = draft.pages.slice(0, MAX_PAGES);
     currentPageIndex = Math.min(
       Number(draft.currentPageIndex) || 0,
@@ -405,8 +454,12 @@ function restoreDraft(userId) {
     return false;
   }
 }
-function clearAllLocalDrafts() {
+function clearAllLocalDrafts(userId) {
   try {
+    const uid = userId || getActiveUserId();
+    if (uid) {
+      localStorage.removeItem(getDraftKey(uid));
+    }
     localStorage.removeItem(LOCAL_DRAFT_KEY);
     localStorage.removeItem("solebio-draft");
     localStorage.removeItem("bhio-draft-guest");
@@ -422,7 +475,7 @@ function clearAllLocalDrafts() {
 }
 function resetEditorToCleanDefault(templateName = DEFAULT_TEMPLATE) {
   clearTimeout(saveTimer);
-  currentSessionUserId = null;
+  currentSessionUserId = getActiveUserId();
   pages = [];
   currentPageIndex = 0;
 
@@ -514,10 +567,20 @@ function addPage() {
     name: `Page ${pages.length + 1}`,
     displayName: "",
     username: pages[0]?.username || "",
+    headline: "",
+    occupation: "",
+    tagline: "",
     bio: "",
+    aboutMe: "",
+    interests: "",
     location: "",
     pageTitle: "",
     visibility: true,
+    ctaEnabled: true,
+    ctaTitle: "Let's Connect",
+    ctaDesc: "",
+    ctaButtonText: "Send a message",
+    ctaButtonUrl: "",
     settings: {
       template: DEFAULT_TEMPLATE,
       font: "DM Sans",
@@ -648,8 +711,6 @@ window.openEditor = openEditor;
 window.applyTemplatePreset = applyTemplatePreset;
 function openLanding() {
   clearTimeout(saveTimer);
-  clearAllLocalDrafts();
-  resetEditorToCleanDefault();
   document.documentElement.classList.remove("has-session");
   $(".app").classList.remove("editor-open");
   $("#previewArea").classList.remove("show");
@@ -1071,18 +1132,57 @@ async function loadProfile(user) {
     .eq("id", user.id)
     .maybeSingle();
   if (error) throw error;
-  if (!data) return;
 
-  const rawUsername = (data.username || user.user_metadata?.username || "").toLowerCase();
+  const rawUsername = (data?.username || user.user_metadata?.username || "").toLowerCase();
   const isJasonAccount = rawUsername === "jasonpedere" || rawUsername === "jason";
 
+  // Check local draft timestamp vs server updated_at
+  const localKey = getDraftKey(user.id);
+  let localDraft = null;
+  try {
+    const raw =
+      localStorage.getItem(localKey) ||
+      localStorage.getItem(LOCAL_DRAFT_KEY) ||
+      localStorage.getItem("solebio-draft");
+    localDraft = JSON.parse(raw || "null");
+  } catch (e) {}
+
+  const localTimestamp = Number(localDraft?.timestamp) || 0;
+  const serverTimestamp = data?.updated_at ? new Date(data.updated_at).getTime() : 0;
+  const hasValidLocalPages =
+    localDraft &&
+    Array.isArray(localDraft.pages) &&
+    localDraft.pages.length > 0;
+
+  // Detect accidental cross-account leak
+  const firstLocalPage = hasValidLocalPages ? localDraft.pages[0] : null;
+  const isLocalLeaked =
+    !isJasonAccount &&
+    firstLocalPage &&
+    (firstLocalPage.displayName === "Jason Pedere" ||
+      firstLocalPage.headline?.includes("JDS Delivery") ||
+      firstLocalPage.bio?.includes("JDS Delivery") ||
+      firstLocalPage.settings?.links?.some((l) => l.title?.includes("JDS Delivery")));
+
+  // If local draft is newer than server record, retain local draft and queue sync to Supabase
+  if (hasValidLocalPages && !isLocalLeaked && localTimestamp > serverTimestamp) {
+    pages = localDraft.pages.slice(0, MAX_PAGES);
+    currentPageIndex = Math.min(
+      Number(localDraft.currentPageIndex) || 0,
+      pages.length - 1,
+    );
+    applyPage(pages[currentPageIndex]);
+    queueSave();
+    return;
+  }
+
   const hasSavedPages =
+    data &&
     data.settings &&
     Array.isArray(data.settings.pages) &&
     data.settings.pages.length > 0;
   const firstPage = hasSavedPages ? data.settings.pages[0] : null;
 
-  // Detect and sanitize accidental cross-account leak (e.g. johntest got Jason's data during previous testing)
   const isLeakedData =
     !isJasonAccount &&
     firstPage &&
@@ -1101,6 +1201,11 @@ async function loadProfile(user) {
   if (hasSavedPages && !isCompletelyBlank && !isLeakedData) {
     pages = data.settings.pages.slice(0, MAX_PAGES);
     if (pages[0]) {
+      if (data.display_name && !pages[0].displayName) pages[0].displayName = data.display_name;
+      if (data.username && !pages[0].username) pages[0].username = `@${data.username}`;
+      if (data.bio && !pages[0].bio) pages[0].bio = data.bio;
+      if (data.location && !pages[0].location) pages[0].location = data.location;
+      if (data.page_title && !pages[0].pageTitle) pages[0].pageTitle = data.page_title;
       if (data.headline && !pages[0].headline) pages[0].headline = data.headline;
       if (data.occupation && !pages[0].occupation) pages[0].occupation = data.occupation;
       if (data.tagline && !pages[0].tagline) pages[0].tagline = data.tagline;
@@ -1111,70 +1216,76 @@ async function loadProfile(user) {
       if (data.cta_button_text && !pages[0].ctaButtonText) pages[0].ctaButtonText = data.cta_button_text;
       if (data.cta_button_url && !pages[0].ctaButtonUrl) pages[0].ctaButtonUrl = data.cta_button_url;
     }
-  } else {
-    const draftRestored = !isLeakedData && restoreDraft(user.id);
-    if (!draftRestored) {
-      const pendingTemplate = sessionStorage.getItem("bhio_pending_template") || DEFAULT_TEMPLATE;
-      const preset = TEMPLATE_PRESETS[pendingTemplate] || TEMPLATE_PRESETS[DEFAULT_TEMPLATE];
-      const initialSettings = {
-        template: preset.template,
-        profileShape: preset.profileShape || "circle",
-        font: preset.font || "DM Sans",
-        background: preset.background || "#e6f1dc",
-        radius: Number.isFinite(preset.radius) ? preset.radius : 8,
-        profileImage: isLeakedData ? "" : data.settings?.profileImage || "",
-        linkStyle: {
-          color: "#ffffff",
-          align: "center",
-          iconPosition: "left",
-          iconTreatment: "plain",
-          ...(preset.linkStyle || {}),
-        },
-        links: [],
-        socials: [],
-      };
+    currentPageIndex = 0;
+    applyPage(pages[0]);
+    saveDraftLocally();
+    return;
+  }
 
-      const initialUsername = data.username
-        ? `@${data.username}`
-        : user.user_metadata?.username
-          ? `@${user.user_metadata.username}`
-          : "";
-      const initialDisplayName =
-        (isLeakedData ? "" : data.display_name) ||
-        user.user_metadata?.full_name ||
-        user.user_metadata?.name ||
-        "";
+  // Fallback: try restoring local draft
+  const draftRestored = !isLocalLeaked && restoreDraft(user.id);
+  if (!draftRestored) {
+    const pendingTemplate = sessionStorage.getItem("bhio_pending_template") || DEFAULT_TEMPLATE;
+    const preset = TEMPLATE_PRESETS[pendingTemplate] || TEMPLATE_PRESETS[DEFAULT_TEMPLATE];
+    const initialSettings = {
+      template: preset.template,
+      profileShape: preset.profileShape || "circle",
+      font: preset.font || "DM Sans",
+      background: preset.background || "#e6f1dc",
+      radius: Number.isFinite(preset.radius) ? preset.radius : 8,
+      profileImage: isLeakedData ? "" : data?.settings?.profileImage || "",
+      linkStyle: {
+        color: "#ffffff",
+        align: "center",
+        iconPosition: "left",
+        iconTreatment: "plain",
+        ...(preset.linkStyle || {}),
+      },
+      links: [],
+      socials: [],
+    };
 
-      pages = [
-        {
-          name: "Page 1",
-          displayName: initialDisplayName,
-          username: initialUsername,
-          headline: isLeakedData ? "" : data.headline || "",
-          occupation: isLeakedData ? "" : data.occupation || "",
-          tagline: isLeakedData ? "" : data.tagline || "",
-          bio: isLeakedData ? "" : data.bio || "",
-          aboutMe: isLeakedData ? "" : data.about_me || "",
-          interests: isLeakedData ? "" : data.interests || "",
-          location: isLeakedData ? "" : data.location || "",
-          pageTitle: data.page_title || "",
-          visibility: data.visibility !== false,
-          ctaEnabled: data.cta_enabled !== false,
-          ctaTitle: "Let's Connect",
-          ctaDesc: "",
-          ctaButtonText: "Send a message",
-          ctaButtonUrl: "",
-          settings: initialSettings,
-        },
-      ];
+    const initialUsername = data?.username
+      ? `@${data.username}`
+      : user.user_metadata?.username
+        ? `@${user.user_metadata.username}`
+        : "";
+    const initialDisplayName =
+      (isLeakedData ? "" : data?.display_name) ||
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      "";
 
-      if (isLeakedData) {
-        queueSave();
-      }
+    pages = [
+      {
+        name: "Page 1",
+        displayName: initialDisplayName,
+        username: initialUsername,
+        headline: isLeakedData ? "" : data?.headline || "",
+        occupation: isLeakedData ? "" : data?.occupation || "",
+        tagline: isLeakedData ? "" : data?.tagline || "",
+        bio: isLeakedData ? "" : data?.bio || "",
+        aboutMe: isLeakedData ? "" : data?.about_me || "",
+        interests: isLeakedData ? "" : data?.interests || "",
+        location: isLeakedData ? "" : data?.location || "",
+        pageTitle: data?.page_title || "",
+        visibility: data?.visibility !== false,
+        ctaEnabled: data?.cta_enabled !== false,
+        ctaTitle: "Let's Connect",
+        ctaDesc: "",
+        ctaButtonText: "Send a message",
+        ctaButtonUrl: "",
+        settings: initialSettings,
+      },
+    ];
+
+    if (isLeakedData) {
+      queueSave();
     }
   }
   currentPageIndex = 0;
   applyPage(pages[0]);
+  saveDraftLocally();
 }
 function syncAll() {
   Object.keys(inputMap).forEach((id) => {
@@ -1449,8 +1560,12 @@ function renderLinks() {
         state.linkStyle.iconPosition === "right"
           ? `${textBlock}${icon}`
           : `${icon}${textBlock}`;
-      const isDark = state.linkStyle.color === "#172219";
-      return `<button class="phone-link content-${state.linkStyle.align} ${link.enabled ? "" : "off"}" style="background:${state.linkStyle.color};${isDark ? "color:#fff;border-color:rgba(255,255,255,0.14);" : ""}" data-focus="link-${index}">${content}</button>`;
+      const isDark = isDarkColor(state.linkStyle.color);
+      const linkTextColor = isDark ? "#ffffff" : "#172219";
+      const linkBorder = isDark
+        ? "border-color:rgba(255,255,255,0.14);"
+        : "border-color:rgba(0,0,0,0.08);";
+      return `<button class="phone-link content-${state.linkStyle.align} ${link.enabled ? "" : "off"}" style="background:${state.linkStyle.color};color:${linkTextColor};${linkBorder}" data-focus="link-${index}">${content}</button>`;
     })
     .join("");
 }
@@ -2256,6 +2371,7 @@ function openPublicShareModal(pageUrl, pageTitle) {
   };
   document.addEventListener("keydown", onKeydown);
 }
+window.renderPublicProfile = renderPublicProfile;
 function renderPublicProfile(profile) {
   const settings = profile.settings || {};
   const page =
@@ -2304,7 +2420,7 @@ function renderPublicProfile(profile) {
   const align = linkStyle.align || "center";
   const iconPosition = linkStyle.iconPosition || "left";
   const linkColor = linkStyle.color || "#ffffff";
-  const isDarkLink = linkColor === "#172219";
+  const isDarkLink = isDarkColor(linkColor);
 
   const savedLinks = Array.isArray(pageSettings.links)
     ? pageSettings.links
@@ -2462,10 +2578,10 @@ function renderPublicProfile(profile) {
     anchor.rel = "noopener noreferrer";
     anchor.style.borderRadius = `${radius}px`;
     anchor.style.background = linkColor;
-    if (isDarkLink) {
-      anchor.style.color = "#fff";
-      anchor.style.borderColor = "rgba(255, 255, 255, 0.14)";
-    }
+    anchor.style.color = isDarkLink ? "#ffffff" : "#172219";
+    anchor.style.borderColor = isDarkLink
+      ? "rgba(255, 255, 255, 0.14)"
+      : "rgba(0, 0, 0, 0.08)";
 
     const iconHtml = getIcon(link, linkStyle);
     const titleEl = document.createElement("div");
@@ -2508,7 +2624,7 @@ function renderPublicProfile(profile) {
     const cta = document.createElement("div");
     cta.className = "public-profile-cta";
     const ctaBtnUrl = page.ctaButtonUrl ? normalizeExternalUrl(page.ctaButtonUrl) || page.ctaButtonUrl : "";
-    const ctaTextColor = linkColor === "#172219" ? "#fff" : "#172219";
+    const ctaTextColor = isDarkColor(linkColor) ? "#ffffff" : "#172219";
     cta.innerHTML = `
       <div class="public-profile-cta-card">
         ${page.ctaTitle ? `<h3 class="public-profile-cta-title">${escapeHtml(page.ctaTitle)}</h3>` : ""}
@@ -2567,11 +2683,23 @@ async function openPublicProfile(username) {
 const publicUsername = publicUsernameFromPath();
 if (publicUsername) openPublicProfile(publicUsername);
 else {
-  if (document.documentElement.classList.contains("has-session")) {
+  const activeUid = getActiveUserId();
+  currentSessionUserId = activeUid;
+  const hasSession =
+    document.documentElement.classList.contains("has-session") ||
+    Boolean(activeUid);
+
+  if (hasSession) {
     openEditor();
   }
   ensureLinkAnalytics();
-  resetEditorToCleanDefault();
+
+  // Restore local draft immediately on startup/refresh so inputs are preserved with zero loss or flash
+  const draftRestored = restoreDraft(activeUid);
+  if (!draftRestored) {
+    resetEditorToCleanDefault();
+  }
+
   renderPageSwitcher();
   renderLinks();
   renderSocials();
@@ -2590,6 +2718,10 @@ else {
   updatePreviewZoom();
   initLegalModalAndCookies();
 }
+
+window.addEventListener("beforeunload", () => {
+  saveDraftLocally();
+});
 
 // ==========================================================================
 // LEGAL / ABOUT MODAL DIALOGS & COOKIE CONSENT
@@ -2797,7 +2929,8 @@ if ("serviceWorker" in navigator) {
   } else {
     window.addEventListener("load", () =>
       navigator.serviceWorker
-        .register("/sw.js")
+        .register("/sw.js", { updateViaCache: "none" })
+        .then((registration) => registration.update())
         .catch((error) =>
           console.error("Could not register service worker:", error),
         ),

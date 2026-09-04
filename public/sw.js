@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bhio-v2';
+const CACHE_NAME = 'bhio-v3';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-192.svg', '/icons/icon-512.svg'];
 
 self.addEventListener('install', () => {
@@ -17,6 +17,16 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const requestUrl = new URL(event.request.url);
+
+  // Always fetch Supabase configuration and SDK code so stale cached assets
+  // cannot make the client appear disconnected after a deployment.
+  if (
+    requestUrl.pathname === '/supabase-config.js' ||
+    requestUrl.hostname === 'cdn.jsdelivr.net' && requestUrl.pathname.includes('/@supabase/supabase-js')
+  ) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
   // Network-first for navigation and config files so updates are immediately visible
   if (event.request.mode === 'navigate' || requestUrl.pathname === '/supabase-config.js') {
