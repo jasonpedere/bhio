@@ -426,12 +426,23 @@ Photographer, creative director, and collector of small beautiful things.</texta
             </div>
           </div>
           <div id="linkList"></div>
-          <input id="logoUpload" type="file" accept="image/*" hidden /><button
-            class="add-link"
-            id="addLink"
-          >
-            <span>+</span>Add a link
-          </button>
+          <input id="logoUpload" type="file" accept="image/*" hidden />
+          <div class="link-actions-group">
+            <button
+              class="add-link"
+              id="addLink"
+              type="button"
+            >
+              <span>+</span>Add a link
+            </button>
+            <button
+              class="add-link add-section-title-btn"
+              id="addSectionTitle"
+              type="button"
+            >
+              <span>+</span>Add section title
+            </button>
+          </div>
         </section>
         <section class="section" id="socials">
           <div class="section-head">
@@ -558,43 +569,45 @@ Photographer, creative director, and collector of small beautiful things.</texta
         </div>
       </section>
       <aside class="preview-area" id="previewArea">
-        <div class="preview-top">
-          <span>Live preview</span
-          ><span id="previewUrl">bhio.link/tessalee</span>
-        </div>
-        <div class="device">
-          <div class="phone-page" id="phonePage" data-align="center">
-            <button
-              class="public-share"
-              id="publicShare"
-              aria-label="Share this page"
-              title="Share this page"
-            >
-              <i class="fa-solid fa-arrow-up-from-bracket"></i>
-            </button>
-            <div
-              class="phone-avatar"
-              data-focus="profile"
-              title="Edit profile photo"
-            ></div>
-            <h2 class="phone-name" data-focus="displayName">Tessa Lee</h2>
-            <p class="phone-handle" id="phoneHandle">@tessalee</p>
-            <div class="phone-headline" id="phoneHeadline" data-focus="headline"></div>
-            <div class="phone-tagline" id="phoneTagline" data-focus="tagline"></div>
-            <p class="phone-bio" data-focus="bio">
-              Photographer, creative director, and collector of small beautiful
-              things.
-            </p>
-            <div class="phone-chips" id="phoneChips">
-              <span class="phone-chip phone-occupation" id="phoneOccupation" data-focus="occupation"><i class="fa-solid fa-briefcase"></i><span class="chip-text"></span></span>
-              <span class="phone-chip phone-location" id="phoneLocation" data-focus="location"><i class="fa-solid fa-location-dot"></i><span class="chip-text">New York, NY</span></span>
+        <div class="preview-scaler">
+          <div class="preview-top">
+            <span>Live preview</span
+            ><span id="previewUrl">bhio.link/tessalee</span>
+          </div>
+          <div class="device">
+            <div class="phone-page" id="phonePage" data-align="center">
+              <button
+                class="public-share"
+                id="publicShare"
+                aria-label="Share this page"
+                title="Share this page"
+              >
+                <i class="fa-solid fa-arrow-up-from-bracket"></i>
+              </button>
+              <div
+                class="phone-avatar"
+                data-focus="profile"
+                title="Edit profile photo"
+              ></div>
+              <h2 class="phone-name" data-focus="displayName">Tessa Lee</h2>
+              <p class="phone-handle" id="phoneHandle">@tessalee</p>
+              <div class="phone-headline" id="phoneHeadline" data-focus="headline"></div>
+              <div class="phone-tagline" id="phoneTagline" data-focus="tagline"></div>
+              <p class="phone-bio" data-focus="bio">
+                Photographer, creative director, and collector of small beautiful
+                things.
+              </p>
+              <div class="phone-chips" id="phoneChips">
+                <span class="phone-chip phone-occupation" id="phoneOccupation" data-focus="occupation"><i class="fa-solid fa-briefcase"></i><span class="chip-text"></span></span>
+                <span class="phone-chip phone-location" id="phoneLocation" data-focus="location"><i class="fa-solid fa-location-dot"></i><span class="chip-text">New York, NY</span></span>
+              </div>
+              <div class="phone-interests" id="phoneInterests" data-focus="interests"></div>
+              <div class="phone-about" id="phoneAbout" data-focus="aboutMe"></div>
+              <div class="phone-links" id="phoneLinks"></div>
+              <div class="phone-cta" id="phoneCta" data-focus="cta"></div>
+              <div class="phone-socials" id="phoneSocials"></div>
+              <a href="/" class="phone-footer" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">Bhio</a>
             </div>
-            <div class="phone-interests" id="phoneInterests" data-focus="interests"></div>
-            <div class="phone-about" id="phoneAbout" data-focus="aboutMe"></div>
-            <div class="phone-links" id="phoneLinks"></div>
-            <div class="phone-cta" id="phoneCta" data-focus="cta"></div>
-            <div class="phone-socials" id="phoneSocials"></div>
-            <a href="/" class="phone-footer" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">Bhio</a>
           </div>
         </div>
       </aside>

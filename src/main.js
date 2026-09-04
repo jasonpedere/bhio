@@ -217,6 +217,7 @@ analyticsSection.innerHTML =
 $("#editor").append(analyticsSection);
 function ensureLinkAnalytics() {
   state.links.forEach((link) => {
+    if (link.type === "header") return;
     link.id =
       link.id ||
       (crypto.randomUUID
@@ -228,13 +229,14 @@ function ensureLinkAnalytics() {
 function renderAnalytics() {
   ensureLinkAnalytics();
   const list = $("#analyticsList");
-  if (!state.links.length) {
+  const trackableLinks = state.links.filter((link) => link.type !== "header");
+  if (!trackableLinks.length) {
     list.innerHTML =
       '<div class="analytics-empty">Add a link to start tracking clicks.</div>';
     return;
   }
   list.innerHTML = "";
-  state.links.forEach((link) => {
+  trackableLinks.forEach((link) => {
     const item = document.createElement("div");
     item.className = "analytics-item";
     const title = document.createElement("span");
@@ -854,13 +856,18 @@ document.addEventListener(
 );
 function renderLinks() {
   $("#linkList").innerHTML = state.links
-    .map(
-      (link, index) =>
-        `<div class="link-row" data-index="${index}"><span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span><div class="link-content"><input class="link-title" value="${escapeHtml(link.title)}" data-index="${index}" data-key="title" placeholder="New link" aria-label="Link title" /><input class="link-desc" value="${escapeHtml(link.description || "")}" data-index="${index}" data-key="description" placeholder="Subtitle / description (optional)" aria-label="Link description" /><input class="link-url" value="${escapeHtml(link.url)}" data-index="${index}" data-key="url" placeholder="https://" aria-label="Link URL" /></div><input class="toggle" type="checkbox" ${link.enabled ? "checked" : ""} data-index="${index}" data-key="enabled" aria-label="Enable link"/><button class="icon-btn danger" data-delete="${index}" aria-label="Delete link" title="Delete link"><i class="fa-solid fa-xmark"></i></button><div class="link-options"><select data-index="${index}" data-key="iconMode" aria-label="Link icon style"><option value="auto" ${link.iconMode === "auto" ? "selected" : ""}>Auto icon</option><option value="image" ${link.iconMode === "image" ? "selected" : ""}>Custom image</option><option value="none" ${link.iconMode === "none" ? "selected" : ""}>No icon</option></select>${link.iconMode === "image" ? `<button class="mini-action" type="button" data-upload="${index}">${link.customImage ? "Change image" : "Choose image"}</button>` : ""}</div></div>`,
-    )
+    .map((link, index) => {
+      if (link.type === "header") {
+        return `<div class="link-row header-row" data-index="${index}"><span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span><div class="link-content header-content"><div class="header-badge"><i class="fa-solid fa-heading"></i><span>Section title</span></div><input class="link-title section-title-input" value="${escapeHtml(link.title)}" data-index="${index}" data-key="title" placeholder="e.g. My Recent Work" aria-label="Section title" /></div><input class="toggle" type="checkbox" ${link.enabled ? "checked" : ""} data-index="${index}" data-key="enabled" aria-label="Enable section title" title="${link.enabled ? "Disable section title" : "Enable section title"}"/><button class="icon-btn danger" data-delete="${index}" aria-label="Delete section title" title="Delete section title"><i class="fa-solid fa-xmark"></i></button></div>`;
+      }
+      return `<div class="link-row" data-index="${index}"><span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span><div class="link-content"><input class="link-title" value="${escapeHtml(link.title)}" data-index="${index}" data-key="title" placeholder="New link" aria-label="Link title" /><input class="link-desc" value="${escapeHtml(link.description || "")}" data-index="${index}" data-key="description" placeholder="Subtitle / description (optional)" aria-label="Link description" /><input class="link-url" value="${escapeHtml(link.url)}" data-index="${index}" data-key="url" placeholder="https://" aria-label="Link URL" /></div><input class="toggle" type="checkbox" ${link.enabled ? "checked" : ""} data-index="${index}" data-key="enabled" aria-label="Enable link"/><button class="icon-btn danger" data-delete="${index}" aria-label="Delete link" title="Delete link"><i class="fa-solid fa-xmark"></i></button><div class="link-options"><select data-index="${index}" data-key="iconMode" aria-label="Link icon style"><option value="auto" ${link.iconMode === "auto" ? "selected" : ""}>Auto icon</option><option value="image" ${link.iconMode === "image" ? "selected" : ""}>Custom image</option><option value="none" ${link.iconMode === "none" ? "selected" : ""}>No icon</option></select>${link.iconMode === "image" ? `<button class="mini-action" type="button" data-upload="${index}">${link.customImage ? "Change image" : "Choose image"}</button>` : ""}</div></div>`;
+    })
     .join("");
   $("#phoneLinks").innerHTML = state.links
     .map((link, index) => {
+      if (link.type === "header") {
+        return `<div class="phone-section-title ${link.enabled ? "" : "off"}" data-focus="link-${index}">${escapeHtml(link.title || "")}</div>`;
+      }
       const icon = getIcon(link);
       const titleHtml = `<div class="link-title-text">${escapeHtml(link.title)}</div>`;
       const descHtml = link.description
@@ -1173,7 +1180,18 @@ $("#linkList").addEventListener("input", (event) => {
   const { index, key } = event.target.dataset;
   if (index === undefined) return;
   state.links[index][key] = event.target.value;
-  if (key === "title" || key === "description") {
+  if (state.links[index]?.type === "header") {
+    if (key === "title") {
+      const sectionEl = document.querySelector(
+        `#phoneLinks .phone-section-title[data-focus="link-${index}"]`,
+      );
+      if (sectionEl) {
+        sectionEl.textContent = event.target.value;
+      } else {
+        renderLinks();
+      }
+    }
+  } else if (key === "title" || key === "description") {
     const card = document.querySelector(
       `#phoneLinks .phone-link[data-focus="link-${index}"]`,
     );
@@ -1272,6 +1290,19 @@ $("#addLink").addEventListener("click", () => {
   renderLinks();
   queueSave();
   document.querySelector("#linkList .link-row:last-child .link-title").focus();
+});
+$("#addSectionTitle")?.addEventListener("click", () => {
+  state.links.push({
+    type: "header",
+    title: "",
+    enabled: true,
+  });
+  renderLinks();
+  queueSave();
+  const input = document.querySelector(
+    "#linkList .link-row:last-child .section-title-input",
+  );
+  if (input) input.focus();
 });
 $("#socialList").addEventListener("input", (event) => {
   const { socialIndex, socialKey } = event.target.dataset;
@@ -1441,8 +1472,15 @@ document.addEventListener("click", (event) => {
   if (!focus) return;
   const target = focus.startsWith("link-") ? $("#links") : $(`#${focus}`);
   target.scrollIntoView({ behavior: "smooth", block: "center" });
-  if (target.tagName === "INPUT" || target.tagName === "TEXTAREA")
+  if (focus.startsWith("link-")) {
+    const idx = focus.replace("link-", "");
+    const rowInput = document.querySelector(
+      `#linkList .link-row[data-index="${idx}"] input[data-key="title"]`,
+    );
+    if (rowInput) setTimeout(() => rowInput.focus(), 300);
+  } else if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
     setTimeout(() => target.focus(), 300);
+  }
 });
 document.querySelectorAll("[data-section]").forEach((button) =>
   button.addEventListener("click", () => {
@@ -1558,6 +1596,84 @@ function socialUrl(social) {
   if (social.service === "website") return normalizeExternalUrl(handle);
   return normalizeExternalUrl(`https://${social.service}.com/${handle}`);
 }
+function openPublicShareModal(pageUrl, pageTitle) {
+  let modal = document.getElementById("publicShareModal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.className = "share-modal";
+    modal.id = "publicShareModal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    document.body.append(modal);
+  }
+  const cleanDisplayUrl = pageUrl.replace(/^https?:\/\//, "");
+  const encodedUrl = encodeURIComponent(pageUrl);
+  const encodedTitle = encodeURIComponent(pageTitle);
+
+  modal.innerHTML = `
+    <div class="share-dialog">
+      <button class="share-close" aria-label="Close share dialog">&times;</button>
+      <h2>Share this page</h2>
+      <p>Let people find this page anywhere.</p>
+      <img class="share-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=312x312&data=${encodedUrl}" alt="QR code" />
+      <span class="share-url">${escapeHtml(cleanDisplayUrl)}</span>
+      <div class="share-actions">
+        <button class="share-action public-copy-btn" type="button">
+          <i class="fa-solid fa-link"></i><span>Copy</span>
+        </button>
+        <a class="share-action" href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-facebook"></i><span>Facebook</span>
+        </a>
+        <a class="share-action" href="https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-x-twitter"></i><span>X</span>
+        </a>
+        <a class="share-action" href="https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-whatsapp"></i><span>WhatsApp</span>
+        </a>
+        <a class="share-action" href="https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-linkedin"></i><span>LinkedIn</span>
+        </a>
+        <a class="share-action" href="https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-telegram"></i><span>Telegram</span>
+        </a>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add("open");
+
+  const closeBtn = modal.querySelector(".share-close");
+  closeBtn?.addEventListener("click", () => modal.classList.remove("open"));
+
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.classList.remove("open");
+  };
+
+  const copyBtn = modal.querySelector(".public-copy-btn");
+  copyBtn?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      const span = copyBtn.querySelector("span");
+      const icon = copyBtn.querySelector("i");
+      if (span) span.textContent = "Copied!";
+      if (icon) icon.className = "fa-solid fa-check";
+      setTimeout(() => {
+        if (span) span.textContent = "Copy";
+        if (icon) icon.className = "fa-solid fa-link";
+      }, 1600);
+    } catch (e) {
+      prompt("Copy link:", pageUrl);
+    }
+  });
+
+  const onKeydown = (e) => {
+    if (e.key === "Escape" && modal.classList.contains("open")) {
+      modal.classList.remove("open");
+      document.removeEventListener("keydown", onKeydown);
+    }
+  };
+  document.addEventListener("keydown", onKeydown);
+}
 function renderPublicProfile(profile) {
   const settings = profile.settings || {};
   const page =
@@ -1625,6 +1741,33 @@ function renderPublicProfile(profile) {
   content.style.setProperty("--public-link-color", linkColor);
   const inner = document.createElement("div");
   inner.className = "public-profile-inner";
+
+  const shareBtn = document.createElement("button");
+  shareBtn.className = "public-share";
+  shareBtn.setAttribute("aria-label", "Share this page");
+  shareBtn.setAttribute("title", "Share this page");
+  shareBtn.innerHTML = '<i class="fa-solid fa-arrow-up-from-bracket"></i>';
+  shareBtn.addEventListener("click", async () => {
+    const pageUrl = window.location.href;
+    const pageTitle =
+      page.pageTitle ||
+      profile.page_title ||
+      `${page.displayName || profile.display_name || profile.username} | Bhio`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: pageTitle,
+          url: pageUrl,
+        });
+        return;
+      } catch (err) {
+        if (err.name === "AbortError") return;
+      }
+    }
+    openPublicShareModal(pageUrl, pageTitle);
+  });
+  inner.append(shareBtn);
+
   if (pageSettings.profileImage) {
     const avatar = document.createElement("div");
     avatar.className = "public-profile-avatar";
@@ -1718,6 +1861,14 @@ function renderPublicProfile(profile) {
   const linkList = document.createElement("div");
   linkList.className = "public-profile-links";
   links.forEach((link) => {
+    if (link.type === "header") {
+      if (!link.title || !link.title.trim()) return;
+      const heading = document.createElement("div");
+      heading.className = "public-profile-section-title";
+      heading.textContent = link.title;
+      linkList.append(heading);
+      return;
+    }
     const href = normalizeExternalUrl(link.url || "");
     if (!href) return;
     const anchor = document.createElement("a");
